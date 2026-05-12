@@ -1,0 +1,15 @@
+packages:
+  - "packages/*"
+  - "apps/*"
+  - "tools/*"
+  - "examples/*"
+
+# Workspace install behavior. Was in .npmrc; pnpm 10 reads these from here too,
+# so we collapse the dotfile.
+linkWorkspacePackages: true
+preferWorkspacePackages: true
+autoInstallPeers: true
+
+# Only allow esbuild to run install scripts. Was in package.json under "pnpm".
+onlyBuiltDependencies:
+  - esbuild

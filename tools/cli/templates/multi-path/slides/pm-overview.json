@@ -1,0 +1,21 @@
+{
+  "id": "pm-overview",
+  "header": "PM only",
+  "title": "Delivery Overview",
+  "layout": "two-col",
+  "path_include": ["pm", "full"],
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Milestones and phases",
+        "Risk register",
+        "Resource plan"
+      ]
+    },
+    {
+      "type": "text",
+      "text": "What we deliver, when, and the dependencies that gate each step."
+    }
+  ]
+}

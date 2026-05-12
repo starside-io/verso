@@ -1,0 +1,913 @@
+/* Verso marketing site. Same token stack as the editor's dark theme so the
+   site feels like an extension of the product. */
+
+:root {
+  --bg: #11111c;
+  --bg-elev: #181825;
+  --pane: #1d1d2c;
+  --pane-warm: #21212f;
+  --fg: #edeef5;
+  --fg-strong: #ffffff;
+  --muted: #9da0b3;
+  --muted-strong: #c8cad6;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --hover: rgba(255, 255, 255, 0.07);
+  --accent: #ff2d87;
+  --accent-glow: rgba(255, 45, 135, 0.4);
+  --accent-soft: rgba(255, 45, 135, 0.16);
+  --info: #5eead4;
+  --warn: #ffb547;
+  --success: #4ade80;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.55), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 12px 48px rgba(255, 45, 135, 0.22), 0 4px 16px rgba(255, 45, 135, 0.12);
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "cv11", "ss01", "ss03";
+  line-height: 1.55;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: #ff8fb8;
+}
+code,
+pre,
+kbd {
+  font-family: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, monospace;
+}
+
+/* Ambient glow background. A couple of soft radial gradients painted onto
+   the body create depth without dominating any single section. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(60vmax 60vmax at 80% -10%, rgba(255, 45, 135, 0.2), transparent 60%),
+    radial-gradient(50vmax 50vmax at -5% 50%, rgba(94, 234, 212, 0.07), transparent 60%);
+}
+main,
+header,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  /* Horizontal only, so the section rule below can own vertical padding
+     without being clobbered by this shorthand. */
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+/* Nav */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  background: rgba(17, 17, 28, 0.7);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.5rem;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+}
+.nav-brand img {
+  height: 28px;
+  width: auto;
+}
+.nav-brand-text {
+  background: linear-gradient(135deg, var(--accent) 0%, #ff8fb8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+.nav-links a {
+  color: var(--muted-strong);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  transition: color 120ms ease, background 120ms ease;
+}
+.nav-links a:hover {
+  color: var(--fg-strong);
+  background: var(--hover);
+}
+.nav-links a.cta {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: var(--shadow-glow);
+}
+.nav-links a.cta:hover {
+  filter: brightness(1.06);
+  color: #fff;
+}
+
+/* Hero */
+
+.hero {
+  padding: 6rem 0 4rem;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.5rem;
+}
+.hero-eyebrow::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+.hero-logo {
+  width: 120px;
+  height: auto;
+  margin: 0 auto 1.5rem;
+}
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin: 0 0 1rem;
+  line-height: 1.05;
+}
+.hero h1 .gradient {
+  background: linear-gradient(135deg, var(--accent) 0%, #ff8fb8 60%, #ffb46e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero p.tagline {
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  color: var(--muted-strong);
+  max-width: 38ch;
+  margin: 0 auto 2rem;
+}
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.2rem;
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 120ms ease;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: var(--shadow-glow);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+.btn-secondary:hover {
+  background: var(--hover);
+  border-color: var(--accent);
+  color: var(--fg-strong);
+}
+
+/* Code snippet showcased under the hero */
+
+.hero-code {
+  margin: 4rem auto 0;
+  max-width: 760px;
+  background: var(--pane);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-align: left;
+}
+.hero-code-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: var(--pane-warm);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.hero-code-head .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+.hero-code-head .dot.red {
+  background: #ff6b6b;
+}
+.hero-code-head .dot.yellow {
+  background: var(--warn);
+}
+.hero-code-head .dot.green {
+  background: var(--success);
+}
+.hero-code-head .file {
+  margin-left: 0.6rem;
+  color: var(--muted-strong);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+.hero-code pre {
+  margin: 0;
+  padding: 1.2rem 1.4rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  color: var(--fg);
+}
+.tok-key {
+  color: #ff7eb6;
+}
+.tok-str {
+  color: #a5e3a4;
+}
+.tok-num {
+  color: #ffc97c;
+}
+.tok-lit {
+  color: #c084fc;
+}
+.tok-com {
+  color: var(--muted);
+  font-style: italic;
+}
+.tok-punct {
+  color: #6a6a78;
+}
+
+/* Generic section. Vertical rhythm: every section uses the same top/bottom
+   padding so the page has a predictable cadence. We set top/bottom only
+   because many sections also carry the `.container` class which sets
+   horizontal padding via the shorthand; using the shorthand here would
+   clobber that left/right value. */
+
+section {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+.section-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.section-title {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--fg-strong);
+}
+.section-lead {
+  font-size: 1.05rem;
+  color: var(--muted-strong);
+  max-width: 60ch;
+  margin: 0 0 2.5rem;
+}
+.section-head {
+  max-width: 720px;
+  margin-bottom: 2.5rem;
+}
+.section-head.center {
+  margin: 0 auto 2.5rem;
+  text-align: center;
+}
+
+/* Three pillars */
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.pillar {
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+.pillar:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+}
+.pillar-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+.pillar h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+  color: var(--fg-strong);
+  letter-spacing: -0.01em;
+}
+.pillar p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.95rem;
+}
+
+/* Feature grid */
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.feature {
+  background: var(--bg-elev);
+  padding: 1.4rem;
+}
+.feature-icon {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+.feature h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--fg-strong);
+  font-weight: 600;
+}
+.feature p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* Two-column showcase */
+
+.showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+@media (max-width: 800px) {
+  .showcase {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+.showcase pre {
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  font-size: 0.82rem;
+  overflow-x: auto;
+  margin: 0;
+}
+
+/* Alternating code-vs-output pairs. Each row swaps which side has the code
+   vs the rendered slide image. The `.flip` modifier on every other row
+   reverses the visual order via grid `direction: rtl` trick. */
+
+.examples {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+.example {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .example {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .example.flip > * {
+    order: initial !important;
+  }
+}
+.example.flip .example-visual {
+  order: 1;
+}
+.example.flip .example-meta {
+  order: 2;
+}
+.example-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.example-meta .layout-tag {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.example-meta h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: -0.01em;
+  color: var(--fg-strong);
+}
+.example-meta p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.example-meta pre {
+  margin-top: 0.5rem;
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+.example-visual {
+  position: relative;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+.example-visual-inner {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  /* Matches the verso-neon slide background so any letterboxing blends. */
+  background: #0a0a14;
+  aspect-ratio: 16 / 9;
+}
+.example-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Path branching showcase. Composed of:
+   1. `.paths-canvas` — a hero panel that mimics the editor's Paths view
+      (slide cards arranged on lanes, with curved colored lines threading
+      through them per audience path).
+   2. `.paths-grid` — three rendered slides showing what each path actually
+      ships when the same source is filtered.
+*/
+
+.paths-canvas {
+  position: relative;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(255, 45, 135, 0.06), transparent 60%),
+    linear-gradient(180deg, var(--pane-warm) 0%, var(--pane) 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.paths-canvas-head {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.paths-canvas-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.8rem;
+  color: var(--muted-strong);
+}
+.paths-canvas-file::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+}
+.paths-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.paths-legend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--muted-strong);
+  font-weight: 500;
+}
+.paths-legend-pill::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pill);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+}
+.paths-canvas-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Slide-card visuals INSIDE the canvas SVG. Drawn as <g> elements via stroke
+   + fill on rect/path. CSS below tunes hover affordance. */
+.paths-canvas-svg .slide-card {
+  transition: transform 200ms ease;
+  cursor: default;
+}
+.paths-canvas-svg .slide-card:hover {
+  transform: translateY(-2px);
+}
+
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+.path-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.path-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.path-card-thumb {
+  background: var(--bg);
+  padding: 22px;
+}
+.path-card-thumb-inner {
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+}
+.path-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.path-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem 1.2rem 1.2rem;
+  border-top: 1px solid var(--border);
+}
+.path-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.path-card-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+}
+.path-card-name {
+  font-weight: 600;
+  color: var(--fg-strong);
+  font-size: 0.98rem;
+  letter-spacing: -0.01em;
+}
+.path-card-filter {
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+.path-card-blurb {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted-strong);
+  line-height: 1.45;
+}
+
+/* The path showcase often wants a JSON note underneath the 3 cards so the
+   reader sees the source. Same code-block treatment as the .example pre. */
+.paths-note {
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.4rem;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Themes showcase: same slide across every built-in theme, in a 3-up grid. */
+
+.themes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--pane);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.theme-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+.theme-card-thumb {
+  background: var(--bg);
+  padding: 22px;
+}
+.theme-card-thumb-inner {
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+}
+.theme-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.theme-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem 1rem;
+  border-top: 1px solid var(--border);
+}
+.theme-card-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+.theme-card-name {
+  font-weight: 600;
+  color: var(--fg-strong);
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+}
+.theme-card-tagline {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Quickstart */
+
+.quickstart {
+  background: var(--pane);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-top: 2rem;
+}
+.quickstart pre {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin: 0.75rem 0 0;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  color: var(--info);
+}
+.quickstart pre + p {
+  margin-top: 1.25rem;
+  color: var(--muted-strong);
+}
+.quickstart p:first-child {
+  margin-top: 0;
+}
+
+/* Final CTA */
+
+.cta {
+  text-align: center;
+  padding: 5rem 0 6rem;
+}
+.cta h2 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  color: var(--fg-strong);
+}
+.cta p {
+  color: var(--muted-strong);
+  margin: 0 0 2rem;
+}
+
+/* Lightbox modal */
+
+.img-zoomable {
+  cursor: zoom-in;
+}
+
+.img-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+.img-modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.img-modal-img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  object-fit: contain;
+  display: block;
+}
+.img-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.4rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 150ms ease;
+}
+.img-modal-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Footer */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0 3rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+.footer-links {
+  display: flex;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+.footer-links a {
+  color: var(--muted-strong);
+}
+.footer-links a:hover {
+  color: var(--accent);
+}

@@ -1,0 +1,25 @@
+{
+  "id": "07-image-right-top",
+  "header": "Bonus",
+  "title": "image-right, vertical: middle",
+  "layout": "image-right",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Bullets anchor to the vertical middle of the column",
+        "Lines up with the center of the adjacent image",
+        "Override per slide with align.vertical"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://placehold.co/600x400/4A90D9/FFFFFF?text=Middle+Aligned",
+      "alt": "Middle aligned"
+    }
+  ],
+  "path_include": [],
+  "align": {
+    "vertical": "middle"
+  }
+}

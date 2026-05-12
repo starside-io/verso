@@ -1,0 +1,28 @@
+{
+  "id": "00-content",
+  "header": "Layout 1 of 6",
+  "title": "content",
+  "layout": "image-right",
+  "content": [
+    {
+      "type": "text",
+      "text": "Edited via Inspector form!"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Free-form content",
+        "Mix bullets, text, code, callouts",
+        "No image required"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://placehold.co/1200x800",
+      "alt": "Image"
+    }
+  ],
+  "notes": "Test speaker notes",
+  "annotation": "Annotation persists now",
+  "transition": "blur"
+}

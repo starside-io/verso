@@ -1,0 +1,11 @@
+{
+  "id": "15-quote",
+  "layout": "quote",
+  "content": [
+    {
+      "type": "quote",
+      "text": "The best way to predict the future is to invent it.",
+      "attribution": "Alan Kay"
+    }
+  ]
+}

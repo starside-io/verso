@@ -1,0 +1,66 @@
+{
+  "name": "@starside-io/verso-cli",
+  "version": "0.1.0",
+  "description": "Verso command-line tool",
+  "keywords": [
+    "presentation",
+    "slides",
+    "pdf",
+    "html",
+    "verso",
+    "cli"
+  ],
+  "license": "Apache-2.0",
+  "author": "starside.io",
+  "homepage": "https://github.com/starside-io/verso#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starside-io/verso.git",
+    "directory": "tools/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/starside-io/verso/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "verso": "./dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@starside-io/verso-build": "workspace:*",
+    "@starside-io/verso-core": "workspace:*",
+    "@starside-io/verso-editor": "workspace:*",
+    "@starside-io/verso-layouts": "workspace:*",
+    "@starside-io/verso-runtime": "workspace:*",
+    "@starside-io/verso-schema": "workspace:*",
+    "@starside-io/verso-themes": "workspace:*",
+    "@starside-io/verso-viewer": "workspace:*",
+    "commander": "12.1.0",
+    "picocolors": "1.1.1"
+  },
+  "devDependencies": {
+    "tsup": "8.3.5",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}

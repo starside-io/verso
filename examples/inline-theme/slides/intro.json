@@ -1,0 +1,9 @@
+{
+  "id": "intro",
+  "header": "Inline",
+  "title": "No themes/ folder",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "Theme colors live directly in deck.json. One file, zero cross-references." }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "id": "warning",
+  "header": "Heads up",
+  "title": "Risk Slide",
+  "layout": "content",
+  "style_overrides": { "primary": "#C0392B" },
+  "content": [
+    {
+      "type": "text",
+      "text": "This slide overrides the primary color to feel urgent. Theme stays warm everywhere else."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Slide-level override: title turns red",
+        "Block-level override possible too",
+        "Other slides remain unaffected"
+      ]
+    }
+  ],
+  "notes": "Show how a single slide can shift tone without touching the theme."
+}

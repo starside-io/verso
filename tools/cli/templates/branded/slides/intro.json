@@ -1,0 +1,9 @@
+{
+  "id": "intro",
+  "header": "Acme Co",
+  "title": "Quarterly Review",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "Built on verso-warm. Most slides leave the theme alone." }
+  ]
+}

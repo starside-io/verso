@@ -1,0 +1,20 @@
+{
+  "id": "05-full-image",
+  "header": "Layout 6 of 6",
+  "title": "full-image",
+  "layout": "full-image",
+  "content": [
+    {
+      "type": "image",
+      "src": "https://placehold.co/1600x900/1A3C6E/FFFFFF?text=Full+Bleed",
+      "alt": "Full bleed background"
+    },
+    {
+      "type": "text",
+      "text": "Image fills the slide, title sits over a gradient at the bottom."
+    }
+  ],
+  "path_include": [
+    "full"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "06-aligned-content",
+  "header": "Bonus",
+  "title": "Aligned content",
+  "layout": "content",
+  "content": [
+    {
+      "type": "text",
+      "text": "Same content layout as slide 1, but center + middle. Set align on any slide."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "horizontal: left | center | right",
+        "vertical: top | middle | bottom",
+        "Each layout picks a sensible default; slides override"
+      ]
+    }
+  ],
+  "path_include": [],
+  "align": {
+    "horizontal": "center",
+    "vertical": "middle"
+  }
+}

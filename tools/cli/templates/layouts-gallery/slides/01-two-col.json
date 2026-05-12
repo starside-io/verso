@@ -1,0 +1,12 @@
+{
+  "id": "01-two-col",
+  "header": "Layout 2 of 6",
+  "title": "two-col",
+  "layout": "two-col",
+  "content": [
+    { "type": "text", "text": "First half lands in the left column." },
+    { "type": "bullets", "items": ["Left bullet a", "Left bullet b"] },
+    { "type": "text", "text": "Second half lands in the right column." },
+    { "type": "bullets", "items": ["Right bullet a", "Right bullet b"] }
+  ]
+}

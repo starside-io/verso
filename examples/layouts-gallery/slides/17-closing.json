@@ -1,0 +1,9 @@
+{
+  "id": "17-closing",
+  "header": "Thank you",
+  "title": "Questions?",
+  "layout": "closing",
+  "content": [
+    { "type": "text", "text": "hello@example.com · @verso" }
+  ]
+}

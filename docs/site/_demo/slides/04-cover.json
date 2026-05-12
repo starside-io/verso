@@ -1,0 +1,10 @@
+{
+  "id": "04-cover",
+  "header": "Q4 2026 readout",
+  "title": "One deck. Many audiences.",
+  "layout": "cover",
+  "omit_from_agenda": true,
+  "content": [
+    { "type": "text", "text": "Prepared by the platform team for sales, engineering, and exec audiences." }
+  ]
+}

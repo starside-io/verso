@@ -1,0 +1,10 @@
+{
+  "title": "Requirements Gathering Workshop",
+  "theme": "verso-slate",
+  "paths": {
+    "ba": { "label": "Business Analysts", "color": "#4A90D9" },
+    "pm": { "label": "Project Managers", "color": "#7B68EE" },
+    "full": { "label": "Full Deck", "color": "#333333" }
+  },
+  "slide_order": ["intro", "shared-context", "ba-deep-dive", "pm-overview", "closing"]
+}

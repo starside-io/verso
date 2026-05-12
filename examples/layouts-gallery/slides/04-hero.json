@@ -1,0 +1,15 @@
+{
+  "id": "04-hero",
+  "header": "Layout 5 of 6",
+  "title": "Hero banner",
+  "layout": "hero",
+  "content": [
+    {
+      "type": "text",
+      "text": "Oversized title, supporting body. Use for section breaks and openers."
+    }
+  ],
+  "path_include": [
+    "full"
+  ]
+}

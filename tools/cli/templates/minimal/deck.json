@@ -1,0 +1,6 @@
+{
+  "title": "Minimal Verso Deck",
+  "theme": "verso-slate",
+  "paths": { "full": { "label": "Full Deck" } },
+  "slide_order": ["intro", "next-steps"]
+}

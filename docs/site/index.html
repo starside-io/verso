@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verso · JSON-driven presentations with audience branching</title>
+  <meta name="description" content="One deck, multiple audiences. Verso is a JSON-driven presentation system with multi-path branching, polished PDF / HTML / PNG export, and a visual editor." />
+  <meta property="og:title" content="Verso · JSON-driven presentations" />
+  <meta property="og:description" content="One deck, multiple audiences. Branch by path, export to PDF / HTML / PNG, present with notes and a laser pointer." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="./verso.svg" />
+  <meta name="theme-color" content="#11111c" />
+  <link rel="icon" href="./verso.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="./">
+        <img src="./verso.svg" alt="" aria-hidden="true" />
+        <span class="nav-brand-text">Verso</span>
+      </a>
+      <nav class="nav-links">
+        <a href="../README.md">Docs</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+        <a class="cta" href="#quickstart">Get started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero ------------------------------------------------------------- -->
+    <section class="hero container">
+      <span class="hero-eyebrow">Open source · Apache 2.0</span>
+      <img class="hero-logo" src="./verso.svg" alt="Verso" />
+      <h1>One deck.<br/><span class="gradient">Many audiences.</span></h1>
+      <p class="tagline">
+        Verso is a JSON-driven presentation system with first-class path branching.
+        Tag slides for sales, engineering, or execs, and ship the same deck to each.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#quickstart">npm install -g @starside-io/verso-cli</a>
+        <a class="btn btn-secondary" href="https://github.com/starside-io/verso" aria-label="View on GitHub">
+          View on GitHub →
+        </a>
+      </div>
+
+      <div class="hero-code" role="figure" aria-label="A slide JSON file">
+        <div class="hero-code-head">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="file">slides/04-pricing.json</span>
+        </div>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"id"</span><span class="tok-punct">:</span> <span class="tok-str">"04-pricing"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"title"</span><span class="tok-punct">:</span> <span class="tok-str">"Pricing"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"two-col"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"transition"</span><span class="tok-punct">:</span> <span class="tok-str">"slide-left"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"sales"</span><span class="tok-punct">,</span> <span class="tok-str">"exec"</span><span class="tok-punct">],</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"heading"</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"$49 / month, per seat"</span> <span class="tok-punct">},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+      <span class="tok-str">"Unlimited decks and paths"</span><span class="tok-punct">,</span>
+      <span class="tok-str">"PDF, HTML, PNG export"</span><span class="tok-punct">,</span>
+      <span class="tok-str">"Visual editor and live reload"</span>
+    <span class="tok-punct">]}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+      </div>
+    </section>
+
+    <!-- Three pillars ---------------------------------------------------- -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Why Verso</div>
+        <h2 class="section-title">A presentation system, not a slideshow tool.</h2>
+        <p class="section-lead" style="margin-left: auto; margin-right: auto;">
+          Verso treats your deck like a codebase: plain JSON, diffable in git, versionable, and authored by humans or LLMs.
+        </p>
+      </div>
+
+      <div class="pillars">
+        <article class="pillar">
+          <div class="pillar-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="12" r="2"/><path d="M6 7v3a4 4 0 0 0 4 4h6M6 17v-3a4 4 0 0 1 4-4h6"/></svg>
+          </div>
+          <h3>Branch by audience</h3>
+          <p>Tag any slide or block with <code>path_include</code> / <code>path_exclude</code>. One source, multiple decks, zero copy-paste.</p>
+        </article>
+
+        <article class="pillar">
+          <div class="pillar-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18M18 3v18M3 12h18"/></svg>
+          </div>
+          <h3>JSON-canonical</h3>
+          <p>Every slide is a plain JSON file. Diffable, scriptable, AI-writable. The visual editor is a UI on top of the same files.</p>
+        </article>
+
+        <article class="pillar">
+          <div class="pillar-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12m-5-5 5 5 5-5"/><path d="M4 19h16"/></svg>
+          </div>
+          <h3>Export anywhere</h3>
+          <p>PDF for print, single-file HTML for sharing, PNG for embedding. All driven by the same renderer, all pixel-identical.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Feature grid ----------------------------------------------------- -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Built-in</div>
+        <h2 class="section-title">Everything a real deck needs.</h2>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">17</div>
+          <h3>Layouts</h3>
+          <p>Content, two/three-col, image-left/right, hero, full-image, cover, section, closing, agenda (auto-built), compare, stats, big-number, quote, timeline.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">16</div>
+          <h3>Transitions</h3>
+          <p>Fade, slide, zoom, flip, iris, wipe, pop, blur. Per-slide, opt-in. Respects <code>prefers-reduced-motion</code>.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">6</div>
+          <h3>Themes</h3>
+          <p>Built-in palettes plus project-local JSON themes. Color cascade: theme → deck → slide → block.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">▶</div>
+          <h3>Speaker mode</h3>
+          <p>Notes pane, next-slide preview, stopwatch. Click-and-drag for a fading laser-pointer trail.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⌕</div>
+          <h3>Find &amp; replace</h3>
+          <p>Deck-wide, with regex and case-sensitive flags. Walks every text field across slides and nested blocks.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">{ }</div>
+          <h3>Variables</h3>
+          <p>Reference <code>{{author}}</code>, <code>{{date}}</code>, <code>{{pathId}}</code> anywhere in slide text. Custom keys via deck properties.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">▢</div>
+          <h3>Embeds</h3>
+          <p>YouTube, CodeSandbox, Figma, anything iframe-shaped. Static fallback when exported to PDF.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">©</div>
+          <h3>Watermark</h3>
+          <p>DRAFT, CONFIDENTIAL, your client's name. Three positions, opacity slider, on every render path.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Alternating code-vs-output examples ----------------------------- -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">By example</div>
+        <h2 class="section-title">What you write. What you ship.</h2>
+        <p class="section-lead" style="margin-left:auto; margin-right:auto;">
+          Each pair: the JSON on one side, the rendered slide on the other. Same source, no surprises.
+        </p>
+      </div>
+
+      <div class="examples">
+        <!-- Cover ↓ json on left, slide on right -->
+        <article class="example">
+          <div class="example-meta">
+            <span class="layout-tag">layout: cover</span>
+            <h3>A cover that doesn't apologize.</h3>
+            <p>Slide-level <code>title</code> and <code>header</code> drive the layout. No template engine, no theme-specific HTML, just JSON.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"id"</span><span class="tok-punct">:</span> <span class="tok-str">"04-cover"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"header"</span><span class="tok-punct">:</span> <span class="tok-str">"Q4 2026 readout"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"title"</span><span class="tok-punct">:</span> <span class="tok-str">"One deck. Many audiences."</span><span class="tok-punct">,</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"cover"</span>
+<span class="tok-punct">}</span></pre>
+          </div>
+          <div class="example-visual">
+            <div class="example-visual-inner">
+              <img src="./images/default-04-cover.png" alt="Rendered cover slide titled 'One deck. Many audiences.'" />
+            </div>
+          </div>
+        </article>
+
+        <!-- Image-left ↓ slide on left, json on right -->
+        <article class="example flip">
+          <div class="example-visual">
+            <div class="example-visual-inner">
+              <img src="./images/full-02-image-left.png" alt="image-left layout: photo centered on the left, bullet points on the right" />
+            </div>
+          </div>
+          <div class="example-meta">
+            <span class="layout-tag">layout: image-left</span>
+            <h3>Mix any blocks. Split into columns.</h3>
+            <p>Pure block list, layout picks the split. Images, bullets, callouts, code: they all compose without configuration.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"image-left"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"image"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"src"</span><span class="tok-punct">:</span> <span class="tok-str">"assets/product.jpg"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"alt"</span><span class="tok-punct">:</span> <span class="tok-str">"Product screenshot"</span> <span class="tok-punct">},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"heading"</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"Key features"</span> <span class="tok-punct">},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+      <span class="tok-str">"Single source of truth"</span><span class="tok-punct">,</span>
+      <span class="tok-str">"Audience branching"</span><span class="tok-punct">,</span>
+      <span class="tok-str">"PDF, HTML, PNG export"</span>
+    <span class="tok-punct">]}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+          </div>
+        </article>
+
+        <!-- Stats ↓ json on left, slide on right -->
+        <article class="example">
+          <div class="example-meta">
+            <span class="layout-tag">layout: stats</span>
+            <h3>Cards become a metric row.</h3>
+            <p>The <code>stats</code> layout takes any number of cards and stretches them across the slide. Each card carries a tone that picks up from the active theme.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"stats"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"card"</span><span class="tok-punct">,</span> <span class="tok-key">"tone"</span><span class="tok-punct">:</span> <span class="tok-str">"primary"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+        <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"heading"</span><span class="tok-punct">,</span> <span class="tok-key">"level"</span><span class="tok-punct">:</span> <span class="tok-num">1</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"12.4K"</span> <span class="tok-punct">},</span>
+        <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"text"</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"Active decks shipped"</span> <span class="tok-punct">}</span>
+      <span class="tok-punct">]</span> <span class="tok-punct">},</span>
+    <span class="tok-com">/* + two more cards for +34% and 97% */</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+          </div>
+          <div class="example-visual">
+            <div class="example-visual-inner">
+              <img src="./images/default-02-stats.png" alt="Stats layout: three metric cards in a row" />
+            </div>
+          </div>
+        </article>
+
+        <!-- Quote ↓ slide on left, json on right -->
+        <article class="example flip">
+          <div class="example-visual">
+            <div class="example-visual-inner">
+              <img src="./images/default-03-quote.png" alt="Quote slide with attribution" />
+            </div>
+          </div>
+          <div class="example-meta">
+            <span class="layout-tag">layout: quote</span>
+            <h3>A single block, the right layout.</h3>
+            <p>Pick the layout that says what you mean. The same <code>quote</code> block reads differently under <code>content</code> vs <code>quote</code> layout.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"quote"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[{</span>
+    <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"quote"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"We used to maintain three decks…"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"attribution"</span><span class="tok-punct">:</span> <span class="tok-str">"VP Marketing, mid-size SaaS"</span>
+  <span class="tok-punct">}]</span>
+<span class="tok-punct">}</span></pre>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Path showcase: stylized timeline + one source slide rendered for three audiences -- -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Path branching</div>
+        <h2 class="section-title">One source. Three audiences.</h2>
+        <p class="section-lead" style="margin-left:auto; margin-right:auto;">
+          Tag any slide or block with <code>path_include</code>. The editor's Paths view shows the whole deck as a timeline: shared cards on the spine, audience-specific cards on branched lanes, and a colored line threading through every path.
+        </p>
+      </div>
+
+      <!-- Stylized Paths-view diagram, same visual language as the editor's
+           Paths tab. Curves are CSS-defined paths; cards are SVG rects with
+           layered text. -->
+      <div class="paths-canvas">
+        <div class="paths-canvas-head">
+          <span class="paths-canvas-file">deck.json &nbsp;·&nbsp; 6 slides &nbsp;·&nbsp; 3 paths</span>
+          <div class="paths-legend">
+            <span class="paths-legend-pill" style="--pill:#5eead4">Sales</span>
+            <span class="paths-legend-pill" style="--pill:#a78bfa">Engineering</span>
+            <span class="paths-legend-pill" style="--pill:#fb923c">Executive</span>
+          </div>
+        </div>
+
+        <svg class="paths-canvas-svg" viewBox="0 0 1120 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagram of one deck branching into three audience paths">
+          <defs>
+            <linearGradient id="card-bg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#22222f"/>
+              <stop offset="1" stop-color="#1a1a25"/>
+            </linearGradient>
+            <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="140%">
+              <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+            </filter>
+          </defs>
+
+          <!-- Path lines, threaded through the cards. Drawn first so the cards
+               cover them at the intersection points. -->
+          <!-- Sales (cyan): spine cards + sales-only branches at col 1 and col 4. -->
+          <path d="M 60 180 C 140 180, 160 70, 240 70 C 320 70, 340 180, 420 180 C 500 180, 520 180, 600 180 C 680 180, 700 260, 780 260 C 860 260, 880 180, 960 180 C 1000 180, 1040 180, 1060 180"
+                fill="none" stroke="#5eead4" stroke-width="2.5" stroke-opacity="0.85" stroke-linecap="round"/>
+          <!-- Engineering (purple): spine + eng-only at col 2 and col 4. -->
+          <path d="M 60 180 C 140 180, 240 180, 240 180 C 340 180, 380 290, 420 290 C 500 290, 520 180, 600 180 C 680 180, 720 290, 780 290 C 860 290, 880 180, 960 180 C 1000 180, 1040 180, 1060 180"
+                fill="none" stroke="#a78bfa" stroke-width="2.5" stroke-opacity="0.85" stroke-linecap="round"/>
+          <!-- Executive (orange): spine, skipping the branched-only middle cards. -->
+          <path d="M 60 180 C 200 180, 260 180, 420 180 C 540 180, 540 180, 600 180 C 700 180, 760 180, 960 180 C 1000 180, 1040 180, 1060 180"
+                fill="none" stroke="#fb923c" stroke-width="2.5" stroke-opacity="0.85" stroke-linecap="round"/>
+
+          <!-- Card: col 0, spine. "Cover" — visible to all. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="20" y="142" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(255,255,255,0.12)"/>
+            <text x="32" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#ff7eb6">01-cover</text>
+            <text x="32" y="184" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Cover</text>
+            <circle cx="100" cy="206" r="3" fill="#5eead4"/>
+            <circle cx="110" cy="206" r="3" fill="#a78bfa"/>
+            <circle cx="120" cy="206" r="3" fill="#fb923c"/>
+          </g>
+
+          <!-- Card: col 1, sales lane. "Custom proposal" — sales only. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="180" y="32" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(94,234,212,0.45)"/>
+            <text x="192" y="54" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#5eead4">02-proposal</text>
+            <text x="192" y="74" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Custom proposal</text>
+            <circle cx="280" cy="96" r="3" fill="#5eead4"/>
+          </g>
+
+          <!-- Card: col 2, eng lane. "Architecture" — engineering only. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="360" y="252" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(167,139,250,0.45)"/>
+            <text x="372" y="274" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#a78bfa">03-arch</text>
+            <text x="372" y="294" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Architecture</text>
+            <circle cx="460" cy="316" r="3" fill="#a78bfa"/>
+          </g>
+
+          <!-- Card: col 3, spine. "Pricing" — visible to all. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="540" y="142" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(255,255,255,0.12)"/>
+            <text x="552" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#ff7eb6">04-pricing</text>
+            <text x="552" y="184" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Pricing</text>
+            <circle cx="620" cy="206" r="3" fill="#5eead4"/>
+            <circle cx="630" cy="206" r="3" fill="#a78bfa"/>
+            <circle cx="640" cy="206" r="3" fill="#fb923c"/>
+          </g>
+
+          <!-- Card: col 4 top, sales lane. "Demo" — sales only. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="720" y="222" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(94,234,212,0.45)"/>
+            <text x="732" y="244" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#5eead4">05-demo</text>
+            <text x="732" y="264" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Live demo</text>
+            <circle cx="820" cy="286" r="3" fill="#5eead4"/>
+          </g>
+
+          <!-- Card: col 5, spine. "Closing" — visible to all. -->
+          <g class="slide-card" filter="url(#card-shadow)">
+            <rect x="940" y="142" width="120" height="76" rx="6" fill="url(#card-bg)" stroke="rgba(255,255,255,0.12)"/>
+            <text x="952" y="164" font-family="ui-monospace, SFMono-Regular, monospace" font-size="10" fill="#ff7eb6">06-closing</text>
+            <text x="952" y="184" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Closing</text>
+            <circle cx="1020" cy="206" r="3" fill="#5eead4"/>
+            <circle cx="1030" cy="206" r="3" fill="#a78bfa"/>
+            <circle cx="1040" cy="206" r="3" fill="#fb923c"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="paths-grid">
+        <article class="path-card">
+          <div class="path-card-thumb">
+            <div class="path-card-thumb-inner">
+              <img src="./images/path-sales.png" alt="Same pricing slide rendered for the sales audience" />
+            </div>
+          </div>
+          <div class="path-card-meta">
+            <div class="path-card-head">
+              <span class="path-card-dot" style="background:#5eead4"></span>
+              <span class="path-card-name">Sales</span>
+              <span class="path-card-filter">?path=sales</span>
+            </div>
+            <p class="path-card-blurb">Pitches branding + audience-targeted variants. The exec and engineering blocks are filtered out.</p>
+          </div>
+        </article>
+
+        <article class="path-card">
+          <div class="path-card-thumb">
+            <div class="path-card-thumb-inner">
+              <img src="./images/path-engineering.png" alt="Same pricing slide rendered for the engineering audience" />
+            </div>
+          </div>
+          <div class="path-card-meta">
+            <div class="path-card-head">
+              <span class="path-card-dot" style="background:#a78bfa"></span>
+              <span class="path-card-name">Engineering</span>
+              <span class="path-card-filter">?path=engineering</span>
+            </div>
+            <p class="path-card-blurb">Surfaces the JSON schema, plugin registry, and CI pipeline story. Sales and exec blocks drop out.</p>
+          </div>
+        </article>
+
+        <article class="path-card">
+          <div class="path-card-thumb">
+            <div class="path-card-thumb-inner">
+              <img src="./images/path-exec.png" alt="Same pricing slide rendered for the executive audience" />
+            </div>
+          </div>
+          <div class="path-card-meta">
+            <div class="path-card-head">
+              <span class="path-card-dot" style="background:#fb923c"></span>
+              <span class="path-card-name">Executive</span>
+              <span class="path-card-filter">?path=exec</span>
+            </div>
+            <p class="path-card-blurb">Single source of truth, audit trail, vendor neutrality. Sales and engineering details disappear.</p>
+          </div>
+        </article>
+      </div>
+
+<pre class="paths-note"><span class="tok-com">// slides/05-paths.json</span>
+<span class="tok-punct">{</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"two-col"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-com">/* shared blocks have no path filter and render everywhere */</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"heading"</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"Included"</span> <span class="tok-punct">},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* core features */</span> <span class="tok-punct">]},</span>
+
+    <span class="tok-com">/* path_include tags scope a block to one audience */</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"sales"</span><span class="tok-punct">],</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* … */</span> <span class="tok-punct">]},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"engineering"</span><span class="tok-punct">],</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* … */</span> <span class="tok-punct">]},</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"exec"</span><span class="tok-punct">],</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* … */</span> <span class="tok-punct">]}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+    </section>
+
+    <!-- Themes showcase: one slide rendered across every built-in theme - -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Themes</div>
+        <h2 class="section-title">Same slide. Six factory defaults.</h2>
+        <p class="section-lead" style="margin-left:auto; margin-right:auto;">
+          Every built-in theme is a small JSON file. Switch with one click, or write your own.
+        </p>
+      </div>
+
+      <div class="themes-grid">
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-slate.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#1A3C6E"></span>
+            <span class="theme-card-name">verso-slate</span>
+            <span class="theme-card-tagline">default</span>
+          </div>
+        </article>
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-warm.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#d1603d"></span>
+            <span class="theme-card-name">verso-warm</span>
+            <span class="theme-card-tagline">terracotta</span>
+          </div>
+        </article>
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-mono.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#1c1c1c"></span>
+            <span class="theme-card-name">verso-mono</span>
+            <span class="theme-card-tagline">charcoal</span>
+          </div>
+        </article>
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-neon.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#ff2d87"></span>
+            <span class="theme-card-name">verso-neon</span>
+            <span class="theme-card-tagline">cyberpunk</span>
+          </div>
+        </article>
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-mars.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#8b1a1a"></span>
+            <span class="theme-card-name">verso-mars</span>
+            <span class="theme-card-tagline">deep red</span>
+          </div>
+        </article>
+        <article class="theme-card">
+          <div class="theme-card-thumb"><div class="theme-card-thumb-inner"><img src="./images/theme-verso-forest.png" alt="" /></div></div>
+          <div class="theme-card-meta">
+            <span class="theme-card-swatch" style="background:#2C5F4A"></span>
+            <span class="theme-card-name">verso-forest</span>
+            <span class="theme-card-tagline">cream + sage</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Quickstart ------------------------------------------------------- -->
+    <section class="container" id="quickstart">
+      <div class="section-head">
+        <div class="section-eyebrow">30-second quickstart</div>
+        <h2 class="section-title">Install, scaffold, edit.</h2>
+        <p class="section-lead">No accounts, no cloud, no proprietary file format. It's npm install, edit JSON, build.</p>
+      </div>
+
+      <div class="quickstart">
+        <p><strong>1.</strong> Install the CLI</p>
+<pre>npm install -g @starside-io/verso-cli</pre>
+
+        <p><strong>2.</strong> Scaffold a deck from a template</p>
+<pre>verso init my-deck --template layouts-gallery
+cd my-deck</pre>
+
+        <p><strong>3.</strong> Open the visual editor or edit JSON directly</p>
+<pre>verso edit            <span style="color: var(--muted)">&#35; full editor with live preview</span>
+verso dev             <span style="color: var(--muted)">&#35; just the viewer, watch JSON</span></pre>
+
+        <p><strong>4.</strong> Export when you're done</p>
+<pre>verso build --format pdf
+verso build --format html   <span style="color: var(--muted)">&#35; single self-contained file</span></pre>
+      </div>
+    </section>
+
+    <!-- Closing CTA ------------------------------------------------------ -->
+    <section class="cta container">
+      <h2>Ship the same deck to every audience.</h2>
+      <p>Open source. Apache 2.0. Maintained by <a href="https://starside.io">starside.io</a>.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://github.com/starside-io/verso">Star on GitHub ★</a>
+        <a class="btn btn-secondary" href="../README.md">Read the docs →</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lightbox modal -->
+  <div id="img-modal" class="img-modal" role="dialog" aria-modal="true" aria-label="Image preview">
+    <button class="img-modal-close" aria-label="Close">&times;</button>
+    <img class="img-modal-img" src="" alt="" />
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById('img-modal')
+      const modalImg = modal.querySelector('.img-modal-img')
+      const closeBtn = modal.querySelector('.img-modal-close')
+
+      function open(src, alt) {
+        modalImg.src = src
+        modalImg.alt = alt || ''
+        modal.classList.add('is-open')
+        document.body.style.overflow = 'hidden'
+        closeBtn.focus()
+      }
+
+      function close() {
+        modal.classList.remove('is-open')
+        document.body.style.overflow = ''
+      }
+
+      document.querySelectorAll('main img').forEach(function (img) {
+        if (img.classList.contains('hero-logo')) return
+        img.classList.add('img-zoomable')
+        img.addEventListener('click', function () { open(img.src, img.alt) })
+      })
+
+      closeBtn.addEventListener('click', close)
+      modal.addEventListener('click', function (e) { if (e.target === modal) close() })
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close() })
+    })()
+  </script>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>© 2026 starside.io · Apache 2.0</span>
+      <div class="footer-links">
+        <a href="../README.md">Docs</a>
+        <a href="../../CONTRIBUTING.md">Contribute</a>
+        <a href="../../SECURITY.md">Security</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

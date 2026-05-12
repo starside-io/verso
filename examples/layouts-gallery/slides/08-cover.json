@@ -1,0 +1,15 @@
+{
+  "id": "08-cover",
+  "header": "Q4 2026 Review",
+  "title": "Looking back, leaning in",
+  "layout": "cover",
+  "content": [
+    {
+      "type": "text",
+      "text": "Acme Corp · December 2026"
+    }
+  ],
+  "path_include": [
+    "full"
+  ]
+}

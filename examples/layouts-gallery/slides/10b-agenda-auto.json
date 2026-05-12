@@ -1,0 +1,9 @@
+{
+  "id": "10b-agenda-auto",
+  "header": "Auto-built",
+  "title": "Agenda (auto)",
+  "layout": "agenda",
+  "content": [],
+  "omit_from_agenda": true,
+  "notes": "Same agenda layout, but with no bullets/headings of its own: the layout falls back to the deck outline (path-filtered, omit_from_agenda excluded). Density (sparse / medium / dense) auto-adjusts to the item count."
+}

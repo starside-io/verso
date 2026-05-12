@@ -1,0 +1,52 @@
+{
+  "name": "@starside-io/verso-runtime",
+  "version": "0.1.0",
+  "description": "Verso rendering engine and public extension API",
+  "license": "Apache-2.0",
+  "author": "starside.io",
+  "homepage": "https://github.com/starside-io/verso#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starside-io/verso.git",
+    "directory": "packages/runtime"
+  },
+  "bugs": {
+    "url": "https://github.com/starside-io/verso/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@starside-io/verso-core": "workspace:*",
+    "@starside-io/verso-schema": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "8.3.5",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}

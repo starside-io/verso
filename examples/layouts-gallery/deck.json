@@ -1,0 +1,45 @@
+{
+  "title": "Layouts Gallery",
+  "theme": "verso-forest",
+  "paths": {
+    "full": {
+      "label": "All Layouts",
+      "color": "#00eb00"
+    },
+    "test": {
+      "label": "Test",
+      "color": "#a78bfa"
+    }
+  },
+  "slide_order": [
+    "00-content",
+    "01-two-col",
+    "03-image-right",
+    "02-image-left",
+    "04-hero",
+    "05-full-image",
+    "06-aligned-content",
+    "07-image-right-top",
+    "08-cover",
+    "09-section",
+    "10-agenda",
+    "10b-agenda-auto",
+    "11-three-col",
+    "12-compare",
+    "13-stats",
+    "14-big-number",
+    "15-quote",
+    "16-timeline",
+    "17-closing",
+    "18-author",
+    "19-primitives"
+  ],
+  "variables": {
+    "author": "Mederic"
+  },
+  "watermark": {
+    "text": "DRAFT",
+    "position": "bottom-left",
+    "opacity": 0.18
+  }
+}

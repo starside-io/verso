@@ -1,0 +1,6 @@
+{
+  "title": "Branded — Theme + Overrides",
+  "theme": "verso-warm",
+  "paths": { "full": { "label": "Full Deck" } },
+  "slide_order": ["intro", "warning", "closing"]
+}

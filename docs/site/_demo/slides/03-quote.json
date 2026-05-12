@@ -1,0 +1,13 @@
+{
+  "id": "03-quote",
+  "header": "Customer story",
+  "title": "What people say",
+  "layout": "quote",
+  "content": [
+    {
+      "type": "quote",
+      "text": "We used to maintain three decks for three audiences. Now we maintain one and tag the slides. Saved us an entire role.",
+      "attribution": "VP Marketing, mid-size SaaS"
+    }
+  ]
+}

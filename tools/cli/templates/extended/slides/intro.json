@@ -1,0 +1,9 @@
+{
+  "id": "intro",
+  "header": "Extension API",
+  "title": "Custom Layouts and Themes",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "This deck registers a custom layout via verso.config.ts." }
+  ]
+}

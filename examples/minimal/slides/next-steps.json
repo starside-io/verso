@@ -1,0 +1,17 @@
+{
+  "id": "next-steps",
+  "header": "Next",
+  "title": "What you can do",
+  "layout": "content",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Edit slides in the slides/ folder",
+        "Add a slide with: verso new slide my-id",
+        "Switch theme by editing the theme field in deck.json"
+      ]
+    }
+  ],
+  "notes": "Keep this short. The whole point is that authoring is pure JSON."
+}

@@ -1,0 +1,13 @@
+{
+  "name": "verso-forest",
+  "colors": {
+    "primary": "#2C5F4A",
+    "secondary": "#7CA982",
+    "classic": "#F0EAD2",
+    "accent": "#D1603D",
+    "surface": "#E0DBC3",
+    "muted": "#6F7E6A",
+    "background": "#F0EAD2",
+    "foreground": "#1F2E27"
+  }
+}

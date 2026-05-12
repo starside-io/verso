@@ -1,0 +1,20 @@
+{
+  "id": "00-content",
+  "header": "Layout 1 of 6",
+  "title": "content",
+  "layout": "content",
+  "content": [
+    {
+      "type": "text",
+      "text": "Header, title, then any content blocks underneath. The default. Use this for most slides."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Free-form content",
+        "Mix bullets, text, code, callouts",
+        "No image required"
+      ]
+    }
+  ]
+}

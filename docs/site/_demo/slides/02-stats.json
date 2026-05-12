@@ -1,0 +1,42 @@
+{
+  "id": "02-stats",
+  "header": "Q4 2026 readout",
+  "title": "Numbers that matter",
+  "layout": "stats",
+  "align": { "vertical": "middle" },
+  "content": [
+    {
+      "type": "card",
+      "tone": "primary",
+      "variant": "soft",
+      "padding": "lg",
+      "content": [
+        { "type": "heading", "level": 1, "text": "12.4K" },
+        { "type": "text", "text": "Decks shipped" },
+        { "type": "badge", "tone": "primary", "variant": "soft", "text": "+18% QoQ" }
+      ]
+    },
+    {
+      "type": "card",
+      "tone": "accent",
+      "variant": "soft",
+      "padding": "lg",
+      "content": [
+        { "type": "heading", "level": 1, "text": "+34%" },
+        { "type": "text", "text": "Weekly authors, YoY" },
+        { "type": "badge", "tone": "accent", "variant": "soft", "text": "Net new" }
+      ]
+    },
+    {
+      "type": "card",
+      "tone": "secondary",
+      "variant": "soft",
+      "padding": "lg",
+      "content": [
+        { "type": "heading", "level": 1, "text": "97%" },
+        { "type": "text", "text": "Slide reuse across audiences" },
+        { "type": "badge", "tone": "secondary", "variant": "soft", "text": "Multi-path" }
+      ]
+    }
+  ]
+}

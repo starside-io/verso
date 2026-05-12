@@ -1,0 +1,22 @@
+{
+  "id": "07-image-right-top",
+  "header": "Bonus",
+  "title": "image-right, vertical: top",
+  "layout": "image-right",
+  "align": { "vertical": "top" },
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "image-* layouts default to vertical: middle",
+        "Override per slide with align.vertical: top",
+        "Image and text both anchor to the top edge"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://placehold.co/600x400/4A90D9/FFFFFF?text=Top+Aligned",
+      "alt": "Top aligned"
+    }
+  ]
+}

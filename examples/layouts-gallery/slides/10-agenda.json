@@ -1,0 +1,18 @@
+{
+  "id": "10-agenda",
+  "header": "Today",
+  "title": "Agenda",
+  "layout": "agenda",
+  "omit_from_agenda": true,
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Where we are",
+        "What changed this quarter",
+        "Open questions",
+        "What we ship next"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+.layout-split-image {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.layout-split-image .split-left,
+.layout-split-image .split-right {
+  min-width: 0;
+}
+
+.layout-split-image .split-right img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+@media (max-width: 800px) {
+  .layout-split-image {
+    grid-template-columns: 1fr;
+  }
+}

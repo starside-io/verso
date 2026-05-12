@@ -1,0 +1,24 @@
+{
+  "id": "02-image-left",
+  "header": "Layout 3 of 6",
+  "title": "image-left",
+  "layout": "image-left",
+  "content": [
+    {
+      "type": "image",
+      "src": "https://placehold.co/600x400/1A3C6E/FFFFFF?text=Image",
+      "alt": "Placeholder"
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Image goes left, text goes right",
+        "First image block in content[] is used",
+        "Other blocks render as the text side"
+      ]
+    }
+  ],
+  "align": {
+    "vertical": "middle"
+  }
+}

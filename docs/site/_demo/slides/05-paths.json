@@ -1,0 +1,70 @@
+{
+  "id": "05-paths",
+  "header": "Pricing",
+  "title": "What you get",
+  "layout": "two-col",
+  "align": { "vertical": "middle" },
+  "content": [
+    { "type": "heading", "level": 2, "text": "Included" },
+    {
+      "type": "bullets",
+      "items": [
+        "Unlimited slides per deck",
+        "PDF, HTML, PNG export",
+        "Visual editor with live preview"
+      ]
+    },
+
+    {
+      "type": "bullets",
+      "path_include": ["sales"],
+      "items": [
+        "Custom branding for every deal",
+        "White-label HTML for client portals",
+        "Audience-targeted variants out of the box"
+      ]
+    },
+    {
+      "type": "bullets",
+      "path_include": ["engineering"],
+      "items": [
+        "JSON Schema for IDE validation",
+        "Pluggable layout + component registry",
+        "Headless rendering API for CI pipelines"
+      ]
+    },
+    {
+      "type": "bullets",
+      "path_include": ["exec"],
+      "items": [
+        "Single source of truth across teams",
+        "Audit trail in your existing git workflow",
+        "Zero vendor lock-in"
+      ]
+    },
+
+    { "type": "heading", "level": 2, "path_include": ["sales"], "text": "What sales gets" },
+    {
+      "type": "callout",
+      "path_include": ["sales"],
+      "tone": "success",
+      "text": "Branded decks per prospect, no copy-paste."
+    },
+
+    { "type": "heading", "level": 2, "path_include": ["engineering"], "text": "What engineering gets" },
+    {
+      "type": "callout",
+      "path_include": ["engineering"],
+      "tone": "info",
+      "text": "Decks are diffable in PRs. Reviews happen on text."
+    },
+
+    { "type": "heading", "level": 2, "path_include": ["exec"], "text": "What execs get" },
+    {
+      "type": "callout",
+      "path_include": ["exec"],
+      "tone": "warn",
+      "text": "One canonical narrative, three audience cuts."
+    }
+  ]
+}

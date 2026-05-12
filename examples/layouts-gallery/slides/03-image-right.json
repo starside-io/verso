@@ -1,0 +1,21 @@
+{
+  "id": "03-image-right",
+  "header": "Layout 4 of 6",
+  "title": "image-right",
+  "layout": "image-right",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Mirror of image-left",
+        "Use whichever reads better for the slide",
+        "AI authors choose by feel"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://placehold.co/600x400/4A90D9/FFFFFF?text=Image",
+      "alt": "Placeholder"
+    }
+  ]
+}

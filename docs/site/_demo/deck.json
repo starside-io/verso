@@ -1,0 +1,29 @@
+{
+  "title": "Verso marketing demo",
+  "theme": "verso-neon",
+  "paths": {
+    "full": {
+      "label": "All slides",
+      "color": "#ff2d87"
+    },
+    "sales": {
+      "label": "Sales",
+      "color": "#5eead4"
+    },
+    "engineering": {
+      "label": "Engineering",
+      "color": "#a78bfa"
+    },
+    "exec": {
+      "label": "Executive",
+      "color": "#fb923c"
+    }
+  },
+  "slide_order": [
+    "04-cover",
+    "01-two-col",
+    "02-stats",
+    "03-quote",
+    "05-paths"
+  ]
+}

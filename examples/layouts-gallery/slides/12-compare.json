@@ -1,0 +1,26 @@
+{
+  "id": "12-compare",
+  "header": "Before / After",
+  "title": "compare",
+  "layout": "compare",
+  "content": [
+    { "type": "heading", "level": 2, "text": "Before" },
+    {
+      "type": "bullets",
+      "items": [
+        "Manual deploy on Fridays",
+        "No staging parity",
+        "Rollbacks took hours"
+      ]
+    },
+    { "type": "heading", "level": 2, "text": "After" },
+    {
+      "type": "bullets",
+      "items": [
+        "Continuous deploy on every merge",
+        "Staging mirrors prod",
+        "Rollback is a single click"
+      ]
+    }
+  ]
+}

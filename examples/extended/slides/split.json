@@ -1,0 +1,21 @@
+{
+  "id": "split",
+  "header": "Custom Layout",
+  "title": "Split Image",
+  "layout": "split-image",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "split-image is registered in verso.config.ts",
+        "Composed from built-in components",
+        "Project ships its own styles.css for layout CSS"
+      ]
+    },
+    {
+      "type": "image",
+      "src": "https://placehold.co/600x400/FFA94D/1B1F24?text=Verso",
+      "alt": "Verso placeholder"
+    }
+  ]
+}

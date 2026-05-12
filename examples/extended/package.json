@@ -1,0 +1,11 @@
+{
+  "name": "@verso-example/extended",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "verso dev" },
+  "dependencies": {
+    "@starside-io/verso-cli": "workspace:*",
+    "@starside-io/verso-runtime": "workspace:*"
+  }
+}

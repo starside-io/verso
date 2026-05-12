@@ -1,0 +1,10 @@
+{
+  "id": "intro",
+  "header": "Workshop",
+  "title": "Requirements Gathering",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "One deck, three paths through it." }
+  ],
+  "notes": "Set expectations. We have a BA path, a PM path, and a full deck."
+}

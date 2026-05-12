@@ -1,0 +1,55 @@
+{
+  "name": "@starside-io/verso-editor",
+  "version": "0.1.0",
+  "description": "Verso visual editor (Preact + signals)",
+  "license": "Apache-2.0",
+  "author": "starside.io",
+  "homepage": "https://github.com/starside-io/verso#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starside-io/verso.git",
+    "directory": "apps/editor"
+  },
+  "bugs": {
+    "url": "https://github.com/starside-io/verso/issues"
+  },
+  "type": "module",
+  "main": "./dist/server.js",
+  "module": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "index.html",
+    "src",
+    "vite.config.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsup",
+    "build:web": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@starside-io/verso-schema": "workspace:*",
+    "@starside-io/verso-themes": "workspace:*",
+    "preact": "10.25.4",
+    "@preact/signals": "1.3.2"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "2.10.1",
+    "tsup": "8.3.5",
+    "typescript": "5.7.3",
+    "vite": "6.0.7"
+  }
+}

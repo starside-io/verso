@@ -1,0 +1,15 @@
+{
+  "title": "Layouts Gallery",
+  "theme": "verso-slate",
+  "paths": { "full": { "label": "All Layouts" } },
+  "slide_order": [
+    "00-content",
+    "01-two-col",
+    "02-image-left",
+    "03-image-right",
+    "04-hero",
+    "05-full-image",
+    "06-aligned-content",
+    "07-image-right-top"
+  ]
+}

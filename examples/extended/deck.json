@@ -1,0 +1,10 @@
+{
+  "title": "Extended — Custom Layout via verso.config.ts",
+  "theme": "acme-dark",
+  "style_overrides": {
+    "background": "#1B1F24",
+    "foreground": "#F4F4F4"
+  },
+  "paths": { "full": { "label": "Full Deck" } },
+  "slide_order": ["intro", "split"]
+}

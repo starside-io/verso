@@ -1,0 +1,10 @@
+{
+  "id": "14-big-number",
+  "title": "big-number",
+  "layout": "big-number",
+  "content": [
+    { "type": "badge", "tone": "accent", "variant": "soft", "text": "ARR growth" },
+    { "type": "heading", "level": 1, "text": "$4.2M" },
+    { "type": "text", "text": "Annualized recurring revenue, up 2.8x year over year." }
+  ]
+}

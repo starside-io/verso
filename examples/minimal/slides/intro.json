@@ -1,0 +1,10 @@
+{
+  "id": "intro",
+  "header": "Welcome",
+  "title": "JSON-driven presentations",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "One deck, multiple paths. Open verso-slate stays untouched." }
+  ],
+  "notes": "Set expectations in 30 seconds."
+}

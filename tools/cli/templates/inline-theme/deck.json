@@ -1,0 +1,17 @@
+{
+  "title": "Inline Theme — Everything in deck.json",
+  "theme": {
+    "name": "midnight",
+    "colors": {
+      "primary": "#7DD3FC",
+      "secondary": "#F472B6",
+      "classic": "#0F172A"
+    }
+  },
+  "style_overrides": {
+    "background": "#0F172A",
+    "foreground": "#E2E8F0"
+  },
+  "paths": { "full": { "label": "Full Deck" } },
+  "slide_order": ["intro", "details"]
+}

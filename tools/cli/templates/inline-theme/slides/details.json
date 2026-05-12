@@ -1,0 +1,17 @@
+{
+  "id": "details",
+  "header": "How it works",
+  "title": "deck.json fields",
+  "layout": "content",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "theme is an object, not a string",
+        "name and colors are required",
+        "style_overrides set background and foreground for the chrome",
+        "AI can write a complete deck.json without ever touching another file"
+      ]
+    }
+  ]
+}

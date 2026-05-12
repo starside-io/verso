@@ -1,0 +1,24 @@
+{
+  "id": "ba-deep-dive",
+  "header": "BA only",
+  "title": "Process Mapping Deep Dive",
+  "layout": "two-col",
+  "path_include": ["ba", "full"],
+  "style_overrides": { "primary": "#D95B4A" },
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "As-is process mapping",
+        "Gap analysis",
+        "Future-state design"
+      ],
+      "style_overrides": { "secondary": "#FFD166" }
+    },
+    {
+      "type": "text",
+      "text": "Capture every interaction, exception, and handoff."
+    }
+  ],
+  "notes": "Skip if PMs are in the room."
+}

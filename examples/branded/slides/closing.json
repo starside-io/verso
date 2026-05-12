@@ -1,0 +1,9 @@
+{
+  "id": "closing",
+  "header": "Thanks",
+  "title": "Questions?",
+  "layout": "hero",
+  "content": [
+    { "type": "text", "text": "Back to the warm theme. Override only what you need, where you need it." }
+  ]
+}

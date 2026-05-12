@@ -1,0 +1,48 @@
+{
+  "id": "13-stats",
+  "header": "Quarter at a glance",
+  "title": "stats",
+  "layout": "stats",
+  "content": [
+    {
+      "type": "card",
+      "tone": "surface",
+      "variant": "soft",
+      "padding": "md",
+      "content": [
+        { "type": "heading", "level": 2, "text": "98%" },
+        { "type": "text", "text": "Uptime" }
+      ]
+    },
+    {
+      "type": "card",
+      "tone": "primary",
+      "variant": "soft",
+      "padding": "md",
+      "content": [
+        { "type": "heading", "level": 2, "text": "12" },
+        { "type": "text", "text": "Releases shipped" }
+      ]
+    },
+    {
+      "type": "card",
+      "tone": "accent",
+      "variant": "soft",
+      "padding": "md",
+      "content": [
+        { "type": "heading", "level": 2, "text": "3.4x" },
+        { "type": "text", "text": "Deploy frequency" }
+      ]
+    },
+    {
+      "type": "card",
+      "tone": "secondary",
+      "variant": "soft",
+      "padding": "md",
+      "content": [
+        { "type": "heading", "level": 2, "text": "42" },
+        { "type": "text", "text": "Active customers" }
+      ]
+    }
+  ]
+}

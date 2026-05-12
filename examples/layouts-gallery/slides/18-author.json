@@ -1,0 +1,20 @@
+{
+  "id": "18-author",
+  "header": "Speaker",
+  "title": "Jane Verso",
+  "layout": "author",
+  "content": [
+    {
+      "type": "text",
+      "text": "Principal engineer at Acme. Builds tools that make presentations less painful."
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "jane@example.com",
+        "@janeverso",
+        "verso.dev"
+      ]
+    }
+  ]
+}

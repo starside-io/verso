@@ -1,0 +1,44 @@
+{
+  "id": "16-timeline",
+  "header": "Roadmap",
+  "title": "timeline",
+  "layout": "timeline",
+  "content": [
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Q1"
+    },
+    {
+      "type": "text",
+      "text": "Foundations: schema and renderer."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Q2"
+    },
+    {
+      "type": "text",
+      "text": "Theme system and path branching."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Q3"
+    },
+    {
+      "type": "text",
+      "text": "Layout gallery and authoring CLI."
+    },
+    {
+      "type": "heading",
+      "level": 3,
+      "text": "Q4"
+    },
+    {
+      "type": "text",
+      "text": "Per-path export and live preview."
+    }
+  ]
+}

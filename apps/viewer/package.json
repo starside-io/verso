@@ -1,0 +1,57 @@
+{
+  "name": "@starside-io/verso-viewer",
+  "version": "0.1.0",
+  "description": "Verso viewer app and dev server",
+  "license": "Apache-2.0",
+  "author": "starside.io",
+  "homepage": "https://github.com/starside-io/verso#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starside-io/verso.git",
+    "directory": "apps/viewer"
+  },
+  "bugs": {
+    "url": "https://github.com/starside-io/verso/issues"
+  },
+  "type": "module",
+  "main": "./dist/server.js",
+  "module": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "index.html",
+    "src",
+    "vite.config.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "dev": "vite",
+    "build:web": "vite build",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@starside-io/verso-build": "workspace:*",
+    "@starside-io/verso-core": "workspace:*",
+    "@starside-io/verso-layouts": "workspace:*",
+    "@starside-io/verso-runtime": "workspace:*",
+    "@starside-io/verso-schema": "workspace:*",
+    "@starside-io/verso-themes": "workspace:*",
+    "vite": "6.0.7"
+  },
+  "devDependencies": {
+    "tsup": "8.3.5",
+    "typescript": "5.7.3",
+    "vitest": "2.1.8"
+  }
+}

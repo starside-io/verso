@@ -1,0 +1,27 @@
+{
+  "id": "closing",
+  "header": "Closing",
+  "title": "Next Actions",
+  "layout": "content",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Summary of decisions",
+        "Owners and dates",
+        "Where notes live"
+      ],
+      "path_include": ["pm", "full"]
+    },
+    {
+      "type": "bullets",
+      "items": [
+        "Open questions to take back",
+        "Documents to update",
+        "Next interview slots"
+      ],
+      "path_include": ["ba", "full"]
+    }
+  ],
+  "notes": "Path-gated bullets reuse the same closing slide for both audiences."
+}

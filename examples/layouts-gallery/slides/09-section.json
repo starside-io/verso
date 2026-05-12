@@ -1,0 +1,10 @@
+{
+  "id": "09-section",
+  "header": "Part 02",
+  "title": "Where we go next",
+  "layout": "section",
+  "content": [
+    { "type": "accent-bar", "tone": "accent", "size": "thick" },
+    { "type": "text", "text": "A short framing line under the section title." }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "11-three-col",
+  "header": "Three pillars",
+  "title": "three-col",
+  "layout": "three-col",
+  "content": [
+    { "type": "heading", "level": 3, "text": "Discover" },
+    { "type": "text", "text": "Find the real problem before solving it." },
+    { "type": "heading", "level": 3, "text": "Decide" },
+    { "type": "text", "text": "Pick the one bet worth making this cycle." },
+    { "type": "heading", "level": 3, "text": "Deliver" },
+    { "type": "text", "text": "Ship it small. Learn fast. Iterate." }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "shared-context",
+  "header": "Shared",
+  "title": "Why we are here",
+  "layout": "content",
+  "content": [
+    {
+      "type": "bullets",
+      "items": [
+        "Why we are gathering requirements now",
+        "Who the stakeholders are",
+        "How decisions will be made"
+      ]
+    }
+  ]
+}
