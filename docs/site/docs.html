@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documentation · Verso</title>
+  <meta name="description" content="Complete reference for Verso: deck manifest, slide schema, layouts, blocks, themes, paths, editor, exports." />
+  <meta name="theme-color" content="#11111c" />
+  <link rel="icon" href="./verso.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="./">
+        <img src="./verso.svg" alt="" aria-hidden="true" />
+        <span class="nav-brand-text">Verso</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./">Home</a>
+        <a href="./get-started.html">Get started</a>
+        <a href="./technical.html">For developers</a>
+        <a class="is-active" href="./docs.html">Docs</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+        <a class="cta" href="./get-started.html">Try Verso</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-soft container" style="padding-bottom: 1rem;">
+      <span class="hero-eyebrow">Reference</span>
+      <h1>Verso <span class="gradient">documentation.</span></h1>
+      <p class="tagline">Everything you need to build, theme, and ship a Verso deck.</p>
+    </section>
+
+    <section class="container" style="padding-top: 1rem;">
+      <div class="docs-layout">
+        <aside class="docs-toc" aria-label="Table of contents">
+          <h4>On this page</h4>
+          <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#cli">CLI commands</a></li>
+            <li><a href="#manifest">Deck manifest</a></li>
+            <li><a href="#slides">Slide schema</a></li>
+            <li><a href="#layouts">Layouts</a></li>
+            <li><a href="#blocks">Content blocks</a></li>
+            <li><a href="#themes">Themes &amp; cascade</a></li>
+            <li><a href="#paths">Path branching</a></li>
+            <li><a href="#variables">Variables</a></li>
+            <li><a href="#transitions">Transitions</a></li>
+            <li><a href="#editor">Visual editor</a></li>
+            <li><a href="#export">Exports</a></li>
+            <li><a href="#speaker">Speaker mode</a></li>
+            <li><a href="#extending">Extending Verso</a></li>
+          </ul>
+        </aside>
+
+        <div class="docs-body">
+
+          <article class="docs-section" id="overview">
+            <h2>Overview</h2>
+            <p>A Verso project is a folder. The folder holds a <code>deck.json</code> manifest, a <code>slides/</code> directory of one JSON file per slide, an optional <code>themes/</code> directory of project themes, and any assets you reference (images, fonts).</p>
+            <p>The CLI runs three roles against that folder: a viewer (<code>verso dev</code>), a visual editor (<code>verso edit</code>), and a static builder (<code>verso build</code>). All three read the same JSON. None of them stores hidden state.</p>
+<pre>my-deck/
+├── deck.json
+├── slides/
+│   ├── 01-cover.json
+│   └── 02-pricing.json
+├── themes/
+│   └── my-brand.json     <span style="color: var(--muted)">&#35; optional</span>
+└── assets/
+    └── logo.svg</pre>
+          </article>
+
+          <article class="docs-section" id="cli">
+            <h2>CLI commands</h2>
+            <table>
+              <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>verso init &lt;dir&gt; [--template &lt;t&gt;]</code></td><td>Scaffold a deck. Templates: <code>minimal</code>, <code>layouts-gallery</code>, <code>multi-path</code>, <code>branded</code>, <code>inline-theme</code>, <code>extended</code>.</td></tr>
+                <tr><td><code>verso dev</code></td><td>Start the viewer with file-watch. Default port 5173.</td></tr>
+                <tr><td><code>verso edit</code></td><td>Start the visual editor + viewer side by side. Default editor 5180, viewer 5173.</td></tr>
+                <tr><td><code>verso new slide &lt;id&gt;</code></td><td>Create a stub slide and append it to <code>slide_order</code>.</td></tr>
+                <tr><td><code>verso new slide --from &lt;file.md&gt;</code></td><td>Import a Markdown outline. Each <code>#</code> heading becomes a slide; nested lists become <code>bullets</code>; fenced code becomes <code>code</code> blocks.</td></tr>
+                <tr><td><code>verso new layout &lt;id&gt;</code></td><td>Scaffold a custom layout in <code>layouts/</code>.</td></tr>
+                <tr><td><code>verso theme &lt;name&gt;</code></td><td>Set the active theme in the manifest.</td></tr>
+                <tr><td><code>verso build [--format pdf|html|png] [--path &lt;id&gt;]</code></td><td>Render the deck to disk. Default <code>pdf</code>. <code>--no-inline-images</code> for HTML keeps URLs instead of base64-inlining.</td></tr>
+              </tbody>
+            </table>
+            <p>Run any command with <code>--help</code> for full flags.</p>
+          </article>
+
+          <article class="docs-section" id="manifest">
+            <h2>Deck manifest</h2>
+            <p><code>deck.json</code> is the spine. It declares the deck title, the active theme, every audience path, the slide order, and any deck-wide variables, watermark, or style overrides.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"title"</span><span class="tok-punct">:</span> <span class="tok-str">"Q4 2026 readout"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"theme"</span><span class="tok-punct">:</span> <span class="tok-str">"verso-slate"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"paths"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span>
+    <span class="tok-key">"sales"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"label"</span><span class="tok-punct">:</span> <span class="tok-str">"Sales"</span><span class="tok-punct">,</span> <span class="tok-key">"color"</span><span class="tok-punct">:</span> <span class="tok-str">"#5eead4"</span> <span class="tok-punct">},</span>
+    <span class="tok-key">"engineering"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"label"</span><span class="tok-punct">:</span> <span class="tok-str">"Engineering"</span><span class="tok-punct">,</span> <span class="tok-key">"color"</span><span class="tok-punct">:</span> <span class="tok-str">"#a78bfa"</span> <span class="tok-punct">}</span>
+  <span class="tok-punct">},</span>
+  <span class="tok-key">"slide_order"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"01-cover"</span><span class="tok-punct">,</span> <span class="tok-str">"02-context"</span><span class="tok-punct">,</span> <span class="tok-str">"03-arch"</span><span class="tok-punct">,</span> <span class="tok-str">"04-closing"</span><span class="tok-punct">]</span><span class="tok-punct">,</span>
+  <span class="tok-key">"variables"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"author"</span><span class="tok-punct">:</span> <span class="tok-str">"M. Burlet"</span> <span class="tok-punct">},</span>
+  <span class="tok-key">"watermark"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"DRAFT"</span><span class="tok-punct">,</span> <span class="tok-key">"position"</span><span class="tok-punct">:</span> <span class="tok-str">"bottom-right"</span><span class="tok-punct">,</span> <span class="tok-key">"opacity"</span><span class="tok-punct">:</span> <span class="tok-num">0.18</span> <span class="tok-punct">},</span>
+  <span class="tok-key">"style_overrides"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"primary"</span><span class="tok-punct">:</span> <span class="tok-str">"#1A3C6E"</span> <span class="tok-punct">}</span>
+<span class="tok-punct">}</span></pre>
+            <h3>Section markers</h3>
+            <p><code>slide_order</code> can also include section objects: <code>{ "id": "part-2", "title": "Part 2: Architecture" }</code>. Sections appear in the auto-built agenda and as dividers in the editor's slide list.</p>
+          </article>
+
+          <article class="docs-section" id="slides">
+            <h2>Slide schema</h2>
+            <p>One file per slide in <code>slides/</code>. Filename is up to you; <code>id</code> in the JSON is the canonical handle.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"id"</span><span class="tok-punct">:</span> <span class="tok-str">"04-pricing"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"title"</span><span class="tok-punct">:</span> <span class="tok-str">"Pricing"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"header"</span><span class="tok-punct">:</span> <span class="tok-str">"Q4 2026"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"two-col"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"transition"</span><span class="tok-punct">:</span> <span class="tok-str">"slide-left"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"align"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"horizontal"</span><span class="tok-punct">:</span> <span class="tok-str">"center"</span><span class="tok-punct">,</span> <span class="tok-key">"vertical"</span><span class="tok-punct">:</span> <span class="tok-str">"middle"</span> <span class="tok-punct">},</span>
+  <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"sales"</span><span class="tok-punct">,</span> <span class="tok-str">"exec"</span><span class="tok-punct">],</span>
+  <span class="tok-key">"omit_from_agenda"</span><span class="tok-punct">:</span> <span class="tok-lit">false</span><span class="tok-punct">,</span>
+  <span class="tok-key">"notes"</span><span class="tok-punct">:</span> <span class="tok-str">"Hammer the cost-of-ownership story."</span><span class="tok-punct">,</span>
+  <span class="tok-key">"annotation"</span><span class="tok-punct">:</span> <span class="tok-str">"Internal review v3"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"style_overrides"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"accent"</span><span class="tok-punct">:</span> <span class="tok-str">"#fb923c"</span> <span class="tok-punct">},</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* blocks */</span> <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+            <h3>Required vs optional</h3>
+            <ul>
+              <li><strong>Required:</strong> <code>id</code>, <code>layout</code>.</li>
+              <li><strong>Optional:</strong> everything else. Most slides will at least set <code>title</code> and <code>content[]</code>.</li>
+            </ul>
+          </article>
+
+          <article class="docs-section" id="layouts">
+            <h2>Layouts (17 built-in)</h2>
+            <p>The layout decides where blocks go on the slide. Pick one with <code>"layout": "..."</code>.</p>
+            <h3>Core</h3>
+            <ul>
+              <li><code>content</code> · single column, centered</li>
+              <li><code>two-col</code> · splits content evenly into two columns</li>
+              <li><code>three-col</code> · three even columns</li>
+              <li><code>image-left</code> / <code>image-right</code> · image on one side, blocks on the other</li>
+              <li><code>hero</code> · oversized title and subtitle</li>
+              <li><code>full-image</code> · edge-to-edge image with optional caption</li>
+            </ul>
+            <h3>Openers &amp; closers</h3>
+            <ul>
+              <li><code>cover</code> · title slide, kicker line, footer</li>
+              <li><code>section</code> · large section divider</li>
+              <li><code>closing</code> · "thank you" / next-steps</li>
+              <li><code>author</code> · presenter card with avatar and bio</li>
+            </ul>
+            <h3>Structured</h3>
+            <ul>
+              <li><code>agenda</code> · auto-built from the deck outline (or manual <code>bullets</code>). <code>omit_from_agenda: true</code> hides the slide from its own table of contents.</li>
+              <li><code>compare</code> · side-by-side comparison columns</li>
+              <li><code>stats</code> · row of metric cards</li>
+              <li><code>big-number</code> · single oversized stat with a label</li>
+              <li><code>quote</code> · pulled quote with attribution</li>
+              <li><code>timeline</code> · ordered milestones</li>
+            </ul>
+          </article>
+
+          <article class="docs-section" id="blocks">
+            <h2>Content blocks</h2>
+            <p>Every entry in <code>content[]</code> is a tagged object. Blocks can carry <code>path_include</code>, <code>path_exclude</code>, and <code>style_overrides</code>.</p>
+            <h3>Text</h3>
+            <ul>
+              <li><code>heading</code> · <code>{ text, level: 1-4 }</code></li>
+              <li><code>text</code> · <code>{ text }</code> (paragraph)</li>
+              <li><code>bullets</code> · <code>{ items: string[] }</code></li>
+              <li><code>quote</code> · <code>{ text, attribution? }</code></li>
+            </ul>
+            <h3>Media</h3>
+            <ul>
+              <li><code>image</code> · <code>{ src, alt?, caption? }</code></li>
+              <li><code>code</code> · <code>{ source, language? }</code></li>
+              <li><code>embed</code> · <code>{ src, title?, aspect?, allow?, fallback_src?, fallback_text? }</code>. PDF / print swaps in the fallback because headless Chromium doesn't reliably rasterize cross-origin frames.</li>
+            </ul>
+            <h3>Containers (recursive)</h3>
+            <ul>
+              <li><code>card</code> · <code>{ tone?, variant?, content: ContentBlock[] }</code></li>
+              <li><code>panel</code> · <code>{ tone?, variant?, content: ContentBlock[] }</code></li>
+            </ul>
+            <h3>Decoration</h3>
+            <ul>
+              <li><code>callout</code> · <code>{ text, tone? }</code></li>
+              <li><code>badge</code> · <code>{ text, tone?, variant? }</code></li>
+              <li><code>accent-bar</code> / <code>divider</code> · visual rules</li>
+              <li><code>custom</code> · for project-defined components, looked up via the runtime registry</li>
+            </ul>
+            <p><strong>Tones:</strong> <code>primary</code> · <code>secondary</code> · <code>accent</code> · <code>muted</code> · <code>surface</code>. <strong>Variants:</strong> <code>soft</code> · <code>solid</code> · <code>outline</code>.</p>
+          </article>
+
+          <article class="docs-section" id="themes">
+            <h2>Themes &amp; the color cascade</h2>
+            <p>A theme is a small JSON file (built-in or in <code>themes/</code>) that names three semantic color roles. Layouts only ever reference CSS variables, never hex.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"my-brand"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"colors"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span>
+    <span class="tok-key">"primary"</span><span class="tok-punct">:</span> <span class="tok-str">"#1A3C6E"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"secondary"</span><span class="tok-punct">:</span> <span class="tok-str">"#4A90D9"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"classic"</span><span class="tok-punct">:</span> <span class="tok-str">"#F4F4F4"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"background"</span><span class="tok-punct">:</span> <span class="tok-str">"#0a0a14"</span><span class="tok-punct">,</span>
+    <span class="tok-key">"foreground"</span><span class="tok-punct">:</span> <span class="tok-str">"#edeef5"</span>
+  <span class="tok-punct">}</span>
+<span class="tok-punct">}</span></pre>
+            <h3>Built-in themes</h3>
+            <ul>
+              <li><code>verso-slate</code> (default), <code>verso-warm</code>, <code>verso-mono</code>, <code>verso-neon</code>, <code>verso-mars</code>, <code>verso-forest</code>.</li>
+            </ul>
+            <h3>Override cascade</h3>
+            <p>Theme defaults → deck <code>style_overrides</code> → slide <code>style_overrides</code> → block <code>style_overrides</code>. Each level emits CSS variables and only affects its own scope. <code>accent</code> falls back to <code>secondary</code>; <code>surface</code> and <code>muted</code> are derived from <code>primary</code>/<code>secondary</code> via <code>color-mix()</code> if not explicitly set.</p>
+          </article>
+
+          <article class="docs-section" id="paths">
+            <h2>Path branching</h2>
+            <p>The headline feature. Paths are declared in the manifest and referenced per slide and per block.</p>
+<pre><span class="tok-punct">{</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"two-col"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-com">/* shared block, no path filter */</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"heading"</span><span class="tok-punct">,</span> <span class="tok-key">"text"</span><span class="tok-punct">:</span> <span class="tok-str">"Pricing"</span> <span class="tok-punct">},</span>
+    <span class="tok-com">/* sales-only block */</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"sales"</span><span class="tok-punct">],</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* … */</span> <span class="tok-punct">]</span> <span class="tok-punct">},</span>
+    <span class="tok-com">/* exec-only block */</span>
+    <span class="tok-punct">{</span> <span class="tok-key">"type"</span><span class="tok-punct">:</span> <span class="tok-str">"bullets"</span><span class="tok-punct">,</span> <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"exec"</span><span class="tok-punct">],</span> <span class="tok-key">"items"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* … */</span> <span class="tok-punct">]</span> <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+            <h3>Resolution rules</h3>
+            <ul>
+              <li>If <code>path_include</code> is set, the slide/block only renders for paths in that list.</li>
+              <li>If <code>path_exclude</code> is set, those paths are removed from the inclusion set.</li>
+              <li>If neither is set, the slide/block renders in every path.</li>
+              <li>The active path is read from <code>?path=&lt;id&gt;</code>. With no <code>?path=</code> the viewer shows a path picker.</li>
+            </ul>
+          </article>
+
+          <article class="docs-section" id="variables">
+            <h2>Variables</h2>
+            <p>Any text field can reference <code>{{key}}</code>. Resolved at render time after HTML escaping.</p>
+            <h3>Built-in keys</h3>
+            <ul>
+              <li><code>{{date}}</code> · today as <code>YYYY-MM-DD</code></li>
+              <li><code>{{time}}</code> · render time as <code>HH:MM</code></li>
+              <li><code>{{deckTitle}}</code> · <code>manifest.title</code></li>
+              <li><code>{{pathId}}</code> · the active path id</li>
+            </ul>
+            <h3>Custom keys</h3>
+            <p>Declare in <code>manifest.variables</code> (or via the editor's <strong>⚙ Deck</strong> dialog). Custom keys win on collision with built-ins.</p>
+            <p>Caveat: substitution runs on the rendered HTML, so <code>{{key}}</code> inside a <code>code</code> block also gets substituted. Escape with a different sigil if you need literal braces in code samples.</p>
+          </article>
+
+          <article class="docs-section" id="transitions">
+            <h2>Transitions (16 built-in)</h2>
+            <p>Set <code>slide.transition</code> to opt in. Plays when the slide becomes active in present or speaker mode. Skipped under <code>prefers-reduced-motion: reduce</code>.</p>
+            <ul>
+              <li><strong>Off:</strong> <code>none</code> (default)</li>
+              <li><strong>Move:</strong> <code>fade</code>, <code>slide-left</code>, <code>slide-right</code>, <code>slide-up</code>, <code>slide-down</code></li>
+              <li><strong>Scale:</strong> <code>zoom</code>, <code>zoom-out</code>, <code>pop</code></li>
+              <li><strong>3D:</strong> <code>flip-x</code>, <code>flip-y</code>, <code>tilt</code></li>
+              <li><strong>Reveal:</strong> <code>iris</code>, <code>wipe-right</code>, <code>wipe-down</code></li>
+              <li><strong>FX:</strong> <code>blur</code></li>
+            </ul>
+            <p>The field is a free-form string at the schema level: register your own <code>.verso-transition-&lt;name&gt;</code> keyframes in <code>styles.css</code> and set the name on the slide.</p>
+          </article>
+
+          <article class="docs-section" id="editor">
+            <h2>Visual editor</h2>
+            <p><code>verso edit</code> opens a three-pane editor: slide list (left), live preview (center), inspector / transitions / themes (right). A JSON panel at the bottom shows the active slide with syntax highlighting.</p>
+            <h3>Toolbar</h3>
+            <ul>
+              <li><strong>+ Slide</strong>, <strong>+ Block ▾</strong> (categorized), <strong>Layout ▾</strong> (17 built-ins), <strong>Align ▾</strong></li>
+              <li><strong>⚙ Deck</strong> · edit deck title and custom variables</li>
+              <li><strong>Watermark</strong> · text, position, opacity</li>
+              <li><strong>⌕ Find</strong> · deck-wide find &amp; replace (<code>Cmd/Ctrl+Shift+F</code>); regex + case-sensitive flags</li>
+              <li><strong>↶ ↷</strong> · per-slide undo/redo, 50-step cap</li>
+              <li><strong>▶ Present</strong> · opens the active path in present mode</li>
+              <li><strong>⤓ Export ▾</strong> · PDF (default), HTML, PNG (per slide)</li>
+            </ul>
+            <h3>Hotkeys</h3>
+            <ul>
+              <li><code>Cmd/Ctrl+K</code> · slide search palette</li>
+              <li><code>Cmd/Ctrl+Shift+F</code> · find &amp; replace</li>
+              <li><code>Cmd/Ctrl+Z</code> / <code>Cmd/Ctrl+Shift+Z</code> · undo / redo</li>
+            </ul>
+            <h3>Image upload</h3>
+            <p>Drag a file onto an image-block input to upload to <code>&lt;project&gt;/assets/</code>. Filenames are sanitized server-side; collisions get a numeric suffix. PNG, JPEG, GIF, SVG, WebP, AVIF up to 25 MB.</p>
+          </article>
+
+          <article class="docs-section" id="export">
+            <h2>Exports</h2>
+            <p>One renderer, three targets.</p>
+            <table>
+              <thead><tr><th>Format</th><th>Command</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td>PDF</td><td><code>verso build --format pdf [--path &lt;id&gt;]</code></td><td>Headless Chromium. Default action of the editor's Export button.</td></tr>
+                <tr><td>HTML</td><td><code>verso build --format html [--no-inline-images]</code></td><td>Single self-contained <code>.html</code> per path. Layout CSS, every slide, scale-to-fit stage, keyboard nav, hash sync. Images base64-inlined by default.</td></tr>
+                <tr><td>PNG</td><td><code>verso build --format png</code></td><td>Per-slide screenshots at 1920x1080.</td></tr>
+              </tbody>
+            </table>
+            <h3>Per-path export</h3>
+            <p>Pass <code>--path &lt;id&gt;</code> to render a single audience. Without it, every path is exported as its own file.</p>
+          </article>
+
+          <article class="docs-section" id="speaker">
+            <h2>Speaker mode</h2>
+            <p>Append <code>?mode=speaker</code> to the viewer URL for a two-panel view: current slide, presenter notes, next-slide preview, and a stopwatch (click to reset).</p>
+            <h3>Laser pointer</h3>
+            <p>In present or speaker mode, click and drag anywhere on the slide to paint a fading red trail. Useful when screen-sharing. No toggle, no setup. Disabled in the editor's preview iframe.</p>
+            <h3>Keyboard navigation</h3>
+            <p>Arrows, PageUp / PageDown, Space, Home, End. Hash in the URL stays in sync so a refresh keeps you on the current slide.</p>
+          </article>
+
+          <article class="docs-section" id="extending">
+            <h2>Extending Verso</h2>
+            <p>Drop a <code>verso.config.ts</code> at the project root to register custom layouts and components.</p>
+<pre><span class="tok-com">// verso.config.ts</span>
+<span class="tok-key">import</span> <span class="tok-punct">{</span> defineConfig <span class="tok-punct">}</span> <span class="tok-key">from</span> <span class="tok-str">'@starside-io/verso-runtime'</span>
+<span class="tok-key">import</span> myCardWall <span class="tok-key">from</span> <span class="tok-str">'./layouts/card-wall'</span>
+<span class="tok-key">import</span> myMermaid <span class="tok-key">from</span> <span class="tok-str">'./components/mermaid'</span>
+
+<span class="tok-key">export default</span> <span class="tok-key">defineConfig</span><span class="tok-punct">({</span>
+  <span class="tok-key">layouts</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">'card-wall'</span><span class="tok-punct">:</span> myCardWall <span class="tok-punct">},</span>
+  <span class="tok-key">components</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">mermaid</span><span class="tok-punct">:</span> myMermaid <span class="tok-punct">}</span>
+<span class="tok-punct">})</span></pre>
+            <p>A layout receives a <code>LayoutContext</code> (resolved colors, the slide, the deck outline, the active path). A component is a function that takes a block and returns HTML.</p>
+            <h3>Project styles</h3>
+            <p>Drop a <code>styles.css</code> or <code>verso.css</code> at the project root and the viewer loads it automatically. Useful for new <code>.verso-transition-&lt;name&gt;</code> keyframes or theme tweaks.</p>
+            <h3>Where the code lives</h3>
+            <ul>
+              <li><code>packages/schema/</code> · Zod schemas (<code>Manifest</code>, <code>Slide</code>, <code>ContentBlock</code>, <code>Theme</code>)</li>
+              <li><code>packages/core/</code> · pure helpers (color resolution, path filtering, content flattening)</li>
+              <li><code>packages/runtime/</code> · <code>renderDeck</code>, <code>mount</code>, layout / component / theme registries</li>
+              <li><code>packages/layouts/</code> · the 17 built-in layouts plus <code>styles.css</code></li>
+              <li><code>packages/themes/</code> · the six built-in themes</li>
+              <li><code>packages/build/</code> · headless-Chromium PDF / HTML / PNG export</li>
+            </ul>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="cta container">
+      <h2>Anything missing?</h2>
+      <p>Open an issue or PR on <a href="https://github.com/starside-io/verso">GitHub</a>. Docs PRs are very welcome.</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>© 2026 starside.io · Apache 2.0</span>
+      <div class="footer-links">
+        <a href="./">Home</a>
+        <a href="../../CONTRIBUTING.md">Contribute</a>
+        <a href="../../SECURITY.md">Security</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

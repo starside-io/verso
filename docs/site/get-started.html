@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Get started · Verso</title>
+  <meta name="description" content="Install Verso in 30 seconds. Use the visual editor or work directly with JSON files from the CLI." />
+  <meta name="theme-color" content="#11111c" />
+  <link rel="icon" href="./verso.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="./">
+        <img src="./verso.svg" alt="" aria-hidden="true" />
+        <span class="nav-brand-text">Verso</span>
+      </a>
+      <nav class="nav-links">
+        <a href="./">Home</a>
+        <a class="is-active" href="./get-started.html">Get started</a>
+        <a href="./technical.html">For developers</a>
+        <a href="./docs.html">Docs</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+        <a class="cta" href="https://github.com/starside-io/verso">★ Star</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero-soft container">
+      <span class="hero-eyebrow">Get started</span>
+      <h1>Two ways to <span class="gradient">use Verso.</span></h1>
+      <p class="tagline">
+        Pick the path that matches how you like to work. Either way it's the same files underneath, so you can switch any time.
+      </p>
+    </section>
+
+    <!-- Install pair -->
+    <section class="container" style="padding-top: 0;">
+      <div class="install-pair">
+        <div class="install-card">
+          <span class="install-card-tag">Option A · friendliest</span>
+          <h3>Visual editor</h3>
+          <p>A web app with drag-and-drop, live preview, and one-click export. Great if you'd rather click than type.</p>
+<pre>npm install -g @starside-io/verso-cli
+verso init my-deck --template layouts-gallery
+cd my-deck
+verso edit</pre>
+          <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">
+            The editor opens in your browser at <code>http://localhost:5180</code>. Save changes and the preview reloads.
+          </p>
+        </div>
+
+        <div class="install-card">
+          <span class="install-card-tag">Option B · keyboard-first</span>
+          <h3>CLI + JSON files</h3>
+          <p>Edit slide files in your favorite editor. Run <code>verso dev</code> to see them render. Diff in git, commit, ship.</p>
+<pre>npm install -g @starside-io/verso-cli
+verso init my-deck --template minimal
+cd my-deck
+verso dev          <span style="color: var(--muted)">&#35; viewer at http://localhost:5173</span></pre>
+          <p style="color: var(--muted); font-size: 0.85rem; margin: 0;">
+            Open <code>slides/</code> in VS Code or any text editor. Saves auto-reload the viewer.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Templates -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Templates</div>
+        <h2 class="section-title">Don't start from a blank file.</h2>
+        <p class="section-lead" style="margin-left:auto; margin-right:auto;">
+          <code>verso init</code> ships with seed decks. Pass <code>--template &lt;name&gt;</code> to pick one.
+        </p>
+      </div>
+
+      <div class="simple-grid is-2x2">
+        <div class="simple-card">
+          <div class="icon-bubble">✦</div>
+          <h3>minimal</h3>
+          <p>One cover slide, one content slide. The smallest valid deck. Good for learning the schema.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">▦</div>
+          <h3>layouts-gallery</h3>
+          <p>One slide per built-in layout. Browse what's possible, copy what you like.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">●</div>
+          <h3>multi-path</h3>
+          <p>Demonstrates path branching with sales / engineering / exec audiences. The best starting point if branching is why you're here.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">✓</div>
+          <h3>branded</h3>
+          <p>Custom theme + watermark + variables wired up. Strip and replace with your brand.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Next steps -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">After you install</div>
+        <h2 class="section-title">A 5-minute tour.</h2>
+      </div>
+
+      <div class="quickstart">
+        <p><strong>1.</strong> Add a slide</p>
+<pre>verso new slide my-first <span style="color: var(--muted)">&#35; or hit "+ Slide" in the editor</span></pre>
+
+        <p><strong>2.</strong> Tag it for an audience</p>
+<pre><span class="tok-com">// in slides/my-first.json</span>
+<span class="tok-punct">{</span>
+  <span class="tok-key">"id"</span><span class="tok-punct">:</span> <span class="tok-str">"my-first"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"layout"</span><span class="tok-punct">:</span> <span class="tok-str">"two-col"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"path_include"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"sales"</span><span class="tok-punct">],</span>
+  <span class="tok-key">"content"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span> <span class="tok-com">/* heading, bullets, etc. */</span> <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></pre>
+
+        <p><strong>3.</strong> Preview a path</p>
+<pre>open <span style="color: var(--info)">'http://localhost:5173/?path=sales'</span></pre>
+
+        <p><strong>4.</strong> Export</p>
+<pre>verso build --format pdf
+verso build --format html   <span style="color: var(--muted)">&#35; single self-contained file</span>
+verso build --format png    <span style="color: var(--muted)">&#35; per-slide images</span></pre>
+
+        <p><strong>5.</strong> Want something specific? Read the <a href="./docs.html">full docs</a> or jump to <a href="./technical.html">how the schema works</a>.</p>
+      </div>
+    </section>
+
+    <!-- Requirements / FAQ -->
+    <section class="container">
+      <div class="section-head center">
+        <div class="section-eyebrow">Before you install</div>
+        <h2 class="section-title">A few small things.</h2>
+      </div>
+
+      <div class="simple-grid is-2x2">
+        <div class="simple-card">
+          <div class="icon-bubble">⌨</div>
+          <h3>Node 18+</h3>
+          <p>Verso uses pnpm-style modern tooling. Any recent Node release works. Check with <code>node -v</code>.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">✦</div>
+          <h3>Browser</h3>
+          <p>The editor and viewer run in any current Chrome, Firefox, Safari, or Edge. PDF export uses bundled headless Chromium.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">●</div>
+          <h3>No account, no cloud</h3>
+          <p>Everything runs on your laptop. Files live on your disk. Sync with git, Dropbox, whatever you already use.</p>
+        </div>
+        <div class="simple-card">
+          <div class="icon-bubble">⤓</div>
+          <h3>Apache 2.0</h3>
+          <p>Use it commercially, fork it, ship a SaaS on top. No strings.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta container">
+      <h2>You're three commands away.</h2>
+      <p>Stuck? Open an issue on <a href="https://github.com/starside-io/verso/issues">GitHub</a>.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="./docs.html">Read the docs →</a>
+        <a class="btn btn-secondary" href="https://github.com/starside-io/verso">Star on GitHub ★</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>© 2026 starside.io · Apache 2.0</span>
+      <div class="footer-links">
+        <a href="./docs.html">Docs</a>
+        <a href="../../CONTRIBUTING.md">Contribute</a>
+        <a href="../../SECURITY.md">Security</a>
+        <a href="https://github.com/starside-io/verso">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
