@@ -63,4 +63,8 @@ export interface MountOptions {
   mode?: 'present' | 'speaker'
   debug?: boolean
   initialSlideId?: string
+  /** Skip mounting the laser-pointer canvas. Set true when the viewer is
+   *  embedded inside the editor preview so click-drag stays available for
+   *  selecting blocks instead of painting a red trail. */
+  disableLaser?: boolean
 }

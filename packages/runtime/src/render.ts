@@ -336,6 +336,7 @@ export const mount = (target: HTMLElement, options: MountOptions): MountResult =
   // so the cost is zero for non-drawing audiences. Disabled in edit mode.
   const laserCleanup = (() => {
     if (mode !== 'present' && mode !== 'speaker') return () => {}
+    if (options.disableLaser) return () => {}
     if (typeof document === 'undefined') return () => {}
     const canvas = document.createElement('canvas')
     canvas.className = 'verso-laser'

@@ -8,12 +8,22 @@ import userConfig from '@starside-io/verso-user-config'
 import '@starside-io/verso-layouts/styles.css'
 import '@starside-io/verso-user-styles'
 
+import { installBrowserIconHydration } from './icons-browser.js'
+
+// Wires Phosphor icon lazy loading + DOM hydration. Must run before any
+// mount call so the Icon component's `requestIconLoad` calls have a loader.
+installBrowserIconHydration()
+
 const params = new URLSearchParams(window.location.search)
 const pathParam = params.get('path')
 const modeParam = params.get('mode') === 'speaker' ? 'speaker' : 'present'
 const debugParam = params.get('debug')
 const debug =
   debugParam === '1' || debugParam === 'true' || debugParam === '' || params.get('mode') === 'debug'
+// When embedded in the editor (iframe sets ?edit=1), disable the laser
+// pointer so click-drag stays available for selecting blocks instead of
+// painting a red trail across the slide.
+const editMode = params.get('edit') === '1'
 
 const fail = (message: string): never => {
   const root = document.getElementById('verso-root')
@@ -70,7 +80,14 @@ const bootstrap = async () => {
 
   const pathIds = Object.keys(manifest.paths)
   if (pathParam == null && pathIds.length > 1) {
-    mount(root as HTMLElement, { manifest, slides, registry, mode: modeParam, debug })
+    mount(root as HTMLElement, {
+      manifest,
+      slides,
+      registry,
+      mode: modeParam,
+      debug,
+      disableLaser: editMode,
+    })
     return
   }
 
@@ -84,6 +101,7 @@ const bootstrap = async () => {
     mode: modeParam,
     debug,
     initialSlideId,
+    disableLaser: editMode,
   })
 
   // Edit mode: enable two-way block selection between this iframe and the
