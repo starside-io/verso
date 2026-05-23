@@ -38,6 +38,14 @@ export const findReplaceOpen = signal<boolean>(false)
 export const deckPropertiesOpen = signal<boolean>(false)
 // Top-toolbar "Watermark" modal: text + position + opacity.
 export const watermarkOpen = signal<boolean>(false)
+// Inspector "Browse icons" picker. Triggered from the IconBlock form. The
+// caller stores a callback that receives the chosen { name, weight } so a
+// single picker instance serves any block that wants to pick an icon.
+export const iconPickerOpen = signal<boolean>(false)
+export const iconPickerSeed = signal<{ name?: string; weight?: string } | null>(null)
+export const iconPickerCallback = signal<((next: { name: string; weight: string }) => void) | null>(
+  null,
+)
 export const loadError = signal<string | null>(null)
 export const loaded = signal(false)
 

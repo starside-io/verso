@@ -8,6 +8,17 @@ export {
   type RenderedDeck,
 } from './render.js'
 export { html, raw, escapeHtml, isRaw, renderToString, type RawHtml } from './html.js'
+export {
+  setIconResolver,
+  setIconLoader,
+  resolveIcon,
+  requestIconLoad,
+  getCachedIcon,
+  getIconCacheSnapshot,
+  primeIconCache,
+  applyIconAttrs,
+  type IconWeightName,
+} from './icons.js'
 export type {
   ComponentDef,
   LayoutDef,

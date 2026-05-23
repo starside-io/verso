@@ -41,6 +41,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
+    "@phosphor-icons/core": "^2.1.1",
     "@starside-io/verso-build": "workspace:*",
     "@starside-io/verso-core": "workspace:*",
     "@starside-io/verso-layouts": "workspace:*",

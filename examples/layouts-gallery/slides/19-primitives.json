@@ -10,6 +10,7 @@
       "variant": "soft",
       "padding": "md",
       "content": [
+        { "type": "icon", "name": "sparkle", "weight": "fill", "size": 40, "tone": "primary" },
         { "type": "badge", "tone": "primary", "variant": "solid", "text": "Card" },
         { "type": "heading", "level": 3, "text": "Soft card" },
         { "type": "text", "text": "tone='primary' variant='soft'" }
@@ -21,6 +22,7 @@
       "variant": "solid",
       "padding": "md",
       "content": [
+        { "type": "icon", "name": "lightning", "weight": "fill", "size": 40, "tone": "surface" },
         { "type": "badge", "tone": "muted", "variant": "soft", "text": "Card" },
         { "type": "heading", "level": 3, "text": "Solid card" },
         { "type": "text", "text": "tone='accent' variant='solid'" }
@@ -32,6 +34,7 @@
       "variant": "outline",
       "padding": "md",
       "content": [
+        { "type": "icon", "name": "diamond", "weight": "bold", "size": 40, "tone": "secondary" },
         { "type": "badge", "tone": "secondary", "variant": "outline", "text": "Card" },
         { "type": "heading", "level": 3, "text": "Outline card" },
         { "type": "text", "text": "tone='secondary' variant='outline'" }

@@ -12,6 +12,7 @@ export {
   HeadingBlock,
   TextBlock,
   BulletsBlock,
+  BulletItem,
   ImageBlock,
   QuoteBlock,
   CodeBlock,
@@ -20,10 +21,13 @@ export {
   BadgeBlock,
   DividerBlock,
   EmbedBlock,
+  IconBlock,
+  ICON_WEIGHTS,
   CardBlock,
   PanelBlock,
   CustomBlock,
 } from './block.js'
+export type { IconWeight } from './block.js'
 export { Slide } from './slide.js'
 export { Theme, ThemeColors } from './theme.js'
 export {

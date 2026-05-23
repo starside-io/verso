@@ -6,14 +6,14 @@
   "content": [
     {
       "type": "text",
-      "text": "Edited via Inspector form!"
+      "text": "Bullets with per-item Phosphor icons."
     },
     {
       "type": "bullets",
       "items": [
-        "Free-form content",
-        "Mix bullets, text, code, callouts",
-        "No image required"
+        { "text": "Free-form content", "icon": "stack", "iconTone": "primary" },
+        { "text": "Mix bullets, text, code, callouts", "icon": "squares-four", "iconTone": "secondary" },
+        { "text": "No image required", "icon": "image", "iconTone": "accent" }
       ]
     },
     {

@@ -1,7 +1,13 @@
 import type { ContentBlock } from '@starside-io/verso-schema'
 import { useRef, useState } from 'preact/hooks'
 import { uploadAsset } from '../api'
-import { flashOk, status } from '../state'
+import {
+  flashOk,
+  iconPickerCallback,
+  iconPickerOpen,
+  iconPickerSeed,
+  status,
+} from '../state'
 
 type Patch<T> = (next: T) => void
 
@@ -9,6 +15,58 @@ const TONES = ['primary', 'secondary', 'accent', 'muted', 'surface'] as const
 const VARIANTS = ['soft', 'solid', 'outline'] as const
 const CALLOUT_TONES = ['info', 'warn', 'success', 'danger'] as const
 const EMBED_ASPECTS = ['16:9', '4:3', '1:1', '21:9', 'auto'] as const
+const ICON_WEIGHTS_LIST = ['thin', 'light', 'regular', 'bold', 'fill', 'duotone'] as const
+type IconWeightOpt = (typeof ICON_WEIGHTS_LIST)[number]
+
+// Shared lazy Phosphor SVG cache for the inspector preview tile. Re-uses the
+// same Vite glob the IconPicker uses (Vite dedupes), so picking an icon in the
+// modal and seeing it in the form preview only downloads the chunk once.
+const inspectorSvgLoaders = import.meta.glob<string>(
+  '/node_modules/@phosphor-icons/core/assets/**/*.svg',
+  { query: '?raw', import: 'default' },
+)
+const inspectorSvgByKey = new Map<string, () => Promise<string>>()
+for (const [path, fn] of Object.entries(inspectorSvgLoaders)) {
+  const m = path.match(/@phosphor-icons\/core\/assets\/([^/]+)\/([^/]+)\.svg$/)
+  if (!m) continue
+  const w = m[1]!
+  let n = m[2]!
+  if (w !== 'regular' && n.endsWith(`-${w}`)) n = n.slice(0, -(w.length + 1))
+  inspectorSvgByKey.set(`${w}/${n}`, fn)
+}
+const inspectorSvgCache = new Map<string, string>()
+
+const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) => {
+  const key = `${weight}/${name}`
+  const cached = inspectorSvgCache.get(key)
+  const [, force] = useState(0)
+  if (!name) {
+    return <span aria-hidden="true" style={{ opacity: 0.4 }}>?</span>
+  }
+  if (!cached) {
+    const fn = inspectorSvgByKey.get(key)
+    if (fn) {
+      fn()
+        .then((svg) => {
+          inspectorSvgCache.set(key, svg)
+          force((n) => n + 1)
+        })
+        .catch(() => {
+          inspectorSvgCache.set(key, '')
+          force((n) => n + 1)
+        })
+    }
+    return <span aria-hidden="true" style={{ opacity: 0.3 }}>…</span>
+  }
+  return (
+    <span
+      aria-hidden="true"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted Phosphor SVGs only
+      dangerouslySetInnerHTML={{ __html: cached }}
+      style={{ display: 'inline-flex', width: '24px', height: '24px' }}
+    />
+  )
+}
 
 interface FormProps {
   block: ContentBlock
@@ -188,20 +246,31 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
       )
 
     case 'bullets': {
-      const items = ((block as any).items as string[]) ?? []
-      const update = (next: string[]) => onChange({ ...block, items: next } as ContentBlock)
+      // Items can be plain strings OR { text, icon?, iconWeight?, iconTone? }.
+      // The form edits the text only; per-item icons live in the JSON panel
+      // until we ship a dedicated per-item icon picker. We preserve any icon
+      // metadata when the user edits the text so it isn't lost.
+      type BulletItem = string | { text: string; icon?: string; iconWeight?: string; iconTone?: string }
+      const items = (((block as any).items as BulletItem[]) ?? [])
+      const textOf = (it: BulletItem): string => (typeof it === 'string' ? it : it.text ?? '')
+      const update = (next: BulletItem[]) => onChange({ ...block, items: next } as ContentBlock)
       return (
         <div class="form-list">
           <span class="form-label">Items</span>
           {items.map((it, i) => (
-            <div class="form-list-row" key={`${i}-${it}`}>
+            <div class="form-list-row" key={`${i}-${textOf(it)}`}>
               <input
                 class="form-input"
                 type="text"
-                value={it}
+                value={textOf(it)}
                 onInput={(e) => {
+                  const newText = (e.currentTarget as HTMLInputElement).value
                   const next = items.slice()
-                  next[i] = (e.currentTarget as HTMLInputElement).value
+                  const cur = items[i]
+                  next[i] =
+                    typeof cur === 'string' || cur === undefined
+                      ? newText
+                      : { ...cur, text: newText }
                   update(next)
                 }}
               />
@@ -330,6 +399,76 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
           />
         </>
       )
+
+    case 'icon': {
+      const iconName = ((block as any).name as string | undefined) ?? ''
+      const iconWeight = ((block as any).weight as string | undefined) ?? 'regular'
+      const openPicker = () => {
+        iconPickerSeed.value = { name: iconName, weight: iconWeight }
+        iconPickerCallback.value = ({ name, weight }) => {
+          onChange({ ...block, name, weight } as ContentBlock)
+        }
+        iconPickerOpen.value = true
+      }
+      return (
+        <>
+          <div class="form-row icon-block-picker-row">
+            <span class="form-label">Icon</span>
+            <button
+              type="button"
+              class="icon-block-picker-btn"
+              onClick={openPicker}
+              aria-label="Browse icons"
+            >
+              <span class="icon-block-picker-preview">
+                <IconPreview name={iconName} weight={iconWeight as IconWeightOpt} />
+              </span>
+              <span class="icon-block-picker-meta">
+                <span class="icon-block-picker-name">{iconName || 'Pick an icon…'}</span>
+                <span class="icon-block-picker-weight">{iconWeight}</span>
+              </span>
+              <span class="icon-block-picker-action">Browse</span>
+            </button>
+          </div>
+          <SelectRow
+            label="Weight"
+            value={(block as any).weight ?? 'regular'}
+            options={ICON_WEIGHTS_LIST}
+            onInput={(v) => onChange({ ...block, weight: v } as ContentBlock)}
+          />
+          <label class="form-row">
+            <span class="form-label">Size (px)</span>
+            <input
+              class="form-input"
+              type="number"
+              min={8}
+              max={512}
+              step={4}
+              value={(block as any).size ?? 32}
+              onInput={(e) => {
+                const n = Number.parseInt((e.currentTarget as HTMLInputElement).value, 10)
+                if (Number.isFinite(n) && n > 0) {
+                  onChange({ ...block, size: n } as ContentBlock)
+                }
+              }}
+            />
+          </label>
+          <SelectRow
+            label="Tone"
+            value={(block as any).tone ?? 'primary'}
+            options={TONES}
+            onInput={(v) => onChange({ ...block, tone: v } as ContentBlock)}
+          />
+          <TextRow
+            label="Label (optional)"
+            value={(block as any).label ?? ''}
+            onInput={(v) =>
+              onChange({ ...block, label: v.trim() || undefined } as ContentBlock)
+            }
+          />
+        </>
+      )
+    }
 
     case 'badge':
       return (

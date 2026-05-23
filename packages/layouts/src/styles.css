@@ -765,6 +765,47 @@
   --tone-color: var(--color-surface);
 }
 
+/* Bullet items that carry a per-item Phosphor icon. The icon replaces the
+   default disc marker; layout uses inline-flex so multiline text still wraps
+   under the text column, not back under the icon. */
+.verso-bullets li.verso-bullet-with-icon {
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+.verso-bullet-icon {
+  flex-shrink: 0;
+  transform: translateY(2px); /* nudge the glyph onto the text baseline */
+}
+.verso-bullet-text {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Phosphor icon block. The SVG uses fill="currentColor", so we just set the
+   span's `color` based on the chosen tone and the rest cascades. The pending
+   placeholder reserves the size box so the slide doesn't jump when the SVG
+   arrives. */
+.verso-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 0;
+  color: var(--color-primary);
+}
+.verso-icon[data-tone="primary"]   { color: var(--color-primary); }
+.verso-icon[data-tone="secondary"] { color: var(--color-secondary); }
+.verso-icon[data-tone="accent"]    { color: var(--color-accent); }
+.verso-icon[data-tone="muted"]     { color: var(--color-muted); }
+.verso-icon[data-tone="surface"]   { color: var(--color-surface); }
+.verso-icon-pending {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border-radius: 4px;
+  opacity: 0.35;
+}
+
 /* card */
 
 .verso-card {

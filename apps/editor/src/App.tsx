@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 import { DeckPropertiesDialog } from './components/DeckPropertiesDialog'
 import { ExportHtmlDialog } from './components/ExportHtmlDialog'
 import { FindReplace } from './components/FindReplace'
+import { IconPicker } from './components/IconPicker'
 import { JsonPanel } from './components/JsonPanel'
 import { PathsView } from './components/PathsView'
 import { Preview } from './components/Preview'
@@ -17,6 +18,9 @@ import {
   findReplaceOpen,
   htmlExportOpen,
   htmlExportRunner,
+  iconPickerCallback,
+  iconPickerOpen,
+  iconPickerSeed,
   loadError,
   loaded,
   redo,
@@ -33,6 +37,7 @@ export const App = () => {
   const [frOpen, setFrOpen] = useState(findReplaceOpen.value)
   const [deckPropOpen, setDeckPropOpen] = useState(deckPropertiesOpen.value)
   const [wmOpen, setWmOpen] = useState(watermarkOpen.value)
+  const [iconOpen, setIconOpen] = useState(iconPickerOpen.value)
 
   useEffect(
     () =>
@@ -66,6 +71,13 @@ export const App = () => {
     () =>
       effect(() => {
         setDeckPropOpen(deckPropertiesOpen.value)
+      }),
+    [],
+  )
+  useEffect(
+    () =>
+      effect(() => {
+        setIconOpen(iconPickerOpen.value)
       }),
     [],
   )
@@ -166,6 +178,17 @@ export const App = () => {
           htmlExportOpen.value = false
         }}
         onChoose={(inline) => htmlExportRunner.value?.(inline)}
+      />
+      <IconPicker
+        open={iconOpen}
+        initialName={iconPickerSeed.value?.name}
+        initialWeight={iconPickerSeed.value?.weight as 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone' | undefined}
+        onPick={(next) => iconPickerCallback.value?.(next)}
+        onClose={() => {
+          iconPickerOpen.value = false
+          iconPickerCallback.value = null
+          iconPickerSeed.value = null
+        }}
       />
     </div>
   )

@@ -84,6 +84,12 @@ export const BLOCK_MENU: BlockMenuEntry[] = [
 
   // Decoration
   {
+    type: 'icon',
+    label: 'Icon',
+    category: 'Decoration',
+    stub: () => ({ type: 'icon', name: 'lightning', weight: 'regular', size: 48, tone: 'primary' }),
+  },
+  {
     type: 'callout',
     label: 'Callout',
     category: 'Decoration',

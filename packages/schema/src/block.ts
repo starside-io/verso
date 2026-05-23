@@ -9,6 +9,11 @@ const BaseBlock = z.object({
   align: Align.optional(),
 })
 
+// Phosphor icon weights. Declared up here because both IconBlock (below) and
+// BulletItem (below) reference it.
+export const ICON_WEIGHTS = ['thin', 'light', 'regular', 'bold', 'fill', 'duotone'] as const
+export type IconWeight = (typeof ICON_WEIGHTS)[number]
+
 export const HeadingBlock = BaseBlock.extend({
   type: z.literal('heading'),
   level: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(2),
@@ -20,9 +25,24 @@ export const TextBlock = BaseBlock.extend({
   text: z.string(),
 })
 
+// A bullets item is either a plain string OR an object that pairs the text
+// with a leading Phosphor icon. The icon picks up `--color-primary` by
+// default; override per-item with `iconTone`. Backward compatible: existing
+// `items: ["a", "b"]` still parses fine.
+export const BulletItem = z.union([
+  z.string(),
+  z.object({
+    text: z.string(),
+    icon: z.string().optional(),
+    iconWeight: z.enum(ICON_WEIGHTS).optional(),
+    iconTone: Tone.optional(),
+  }),
+])
+export type BulletItem = z.infer<typeof BulletItem>
+
 export const BulletsBlock = BaseBlock.extend({
   type: z.literal('bullets'),
-  items: z.array(z.string()),
+  items: z.array(BulletItem),
 })
 
 export const ImageBlock = BaseBlock.extend({
@@ -83,6 +103,21 @@ export const EmbedBlock = BaseBlock.extend({
   allow: z.string().optional(),
 })
 
+// Phosphor icon block. `name` is the Phosphor icon id (kebab-case, e.g.
+// "lightning", "check-circle"). `weight` picks one of Phosphor's six visual
+// weights (defaults to regular). `tone` maps to the existing color cascade
+// (--color-primary, --color-secondary, etc.) via CSS variables so themes
+// drive the rendered color. `label` makes the icon focusable to assistive
+// tech; omit for purely decorative use.
+export const IconBlock = BaseBlock.extend({
+  type: z.literal('icon'),
+  name: z.string(),
+  weight: z.enum(ICON_WEIGHTS).optional(),
+  size: z.number().int().positive().optional(),
+  tone: Tone.optional(),
+  label: z.string().optional(),
+})
+
 export const CustomBlock = BaseBlock.extend({
   type: z.string(),
 }).passthrough()
@@ -98,6 +133,7 @@ export type AccentBarBlock = z.infer<typeof AccentBarBlock>
 export type BadgeBlock = z.infer<typeof BadgeBlock>
 export type DividerBlock = z.infer<typeof DividerBlock>
 export type EmbedBlock = z.infer<typeof EmbedBlock>
+export type IconBlock = z.infer<typeof IconBlock>
 export type CustomBlock = z.infer<typeof CustomBlock>
 
 type BaseBlockShape = z.infer<typeof BaseBlock>
@@ -130,6 +166,7 @@ export type ContentBlock =
   | BadgeBlock
   | DividerBlock
   | EmbedBlock
+  | IconBlock
   | CardBlock
   | PanelBlock
   | CustomBlock
@@ -147,6 +184,7 @@ export const ContentBlock: z.ZodType<ContentBlock> = z.lazy(() =>
     BadgeBlock,
     DividerBlock,
     EmbedBlock,
+    IconBlock,
     CardBlock,
     PanelBlock,
     CustomBlock,
