@@ -254,7 +254,13 @@ export const agenda = defineLayout({
 
     let items: { text: string; isSection: boolean }[]
     if (bullets) {
-      items = bullets.items.map((t) => ({ text: t, isSection: false }))
+      // Items can be plain strings OR { text, icon? }; agenda only needs
+      // the text part. Per-item icons aren't rendered in the agenda layout
+      // (yet); they're ignored for now.
+      items = bullets.items.map((t) => ({
+        text: typeof t === 'string' ? t : t.text,
+        isSection: false,
+      }))
     } else if (headingItems.length > 0) {
       items = headingItems
     } else {
