@@ -1,0 +1,72 @@
+name: Release
+
+# Two-step changeset flow.
+#
+# 1. Push to main with one or more `.changeset/*.md` files present.
+# 2. This workflow opens (or updates) a PR titled "Version Packages" that
+#    bumps versions and consumes the changesets.
+# 3. Merging that PR triggers this workflow again — at which point the
+#    `.changeset/*.md` files are gone, so the action runs `pnpm release`
+#    instead and publishes every bumped package to npm + creates tags.
+#
+# Setup needed exactly once:
+#   - Generate a Granular Access Token on npmjs.com with:
+#       Packages: @starside-io/*
+#       Permission: Read and write
+#       ✅ Allow this token to bypass two-factor authentication
+#   - GitHub repo → Settings → Secrets and variables → Actions →
+#     New repository secret named NPM_TOKEN with that value.
+#   - GitHub repo → Settings → Actions → General →
+#     Workflow permissions → "Read and write" + "Allow GitHub Actions to
+#     create and approve pull requests" so the bot can open the version PR.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # changesets/action wants full history to compute changelogs.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm -r build
+
+      - name: Create release PR or publish
+        uses: changesets/action@v1
+        with:
+          # When changesets are present: opens a "Version Packages" PR.
+          # When merged (changesets absent, versions bumped): runs publish.
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          commit: "chore(release): version packages"
+          title: "chore(release): version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
