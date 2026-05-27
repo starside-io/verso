@@ -1,5 +1,12 @@
 # @starside-io/verso-core
 
+## 0.1.2
+
+### Patch Changes
+
+- Updated dependencies [[`6aa9558`](https://github.com/starside-io/verso/commit/6aa9558af79579ece9d2f31d8450428d794085d8)]:
+  - @starside-io/verso-schema@0.3.0
+
 ## 0.1.1
 
 ### Patch Changes
