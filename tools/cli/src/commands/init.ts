@@ -1,7 +1,27 @@
+import { execSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, readdirSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { type TemplateName, knownTemplates, templatesDir } from '../templates.js'
 import { log, writeJson } from '../utils.js'
+
+/**
+ * True if `verso` is already on PATH (typically via a global install). When
+ * it is, we skip declaring @starside-io/verso-cli as a project dep and skip
+ * the install hint, because the global CLI already satisfies `verso dev` and
+ * `verso build` in the project's package.json scripts.
+ *
+ * When the CLI is NOT global (e.g. an AI skill running in a sandbox without
+ * a pre-installed CLI), we keep the dep + install hint so the project can
+ * bootstrap from npm install alone.
+ */
+const hasGlobalVerso = (): boolean => {
+  try {
+    execSync('command -v verso', { stdio: 'ignore', shell: '/bin/sh' })
+    return true
+  } catch {
+    return false
+  }
+}
 
 export interface InitOptions {
   template?: string
@@ -40,6 +60,8 @@ export const runInit = async (rawName: string | undefined, opts: InitOptions): P
   const src = join(templatesDir, template)
   copyDir(src, target)
 
+  const globalCli = hasGlobalVerso()
+
   writeJson(
     join(target, 'package.json'),
     {
@@ -51,9 +73,10 @@ export const runInit = async (rawName: string | undefined, opts: InitOptions): P
         dev: 'verso dev',
         build: 'verso build',
       },
-      dependencies: {
-        '@starside-io/verso-cli': '^0.1.0',
-      },
+      // Only declare the CLI as a project dep when there's no global
+      // install. Otherwise the user would re-download the entire CLI tree
+      // for every new deck even though `verso` already works from PATH.
+      ...(globalCli ? {} : { dependencies: { '@starside-io/verso-cli': '^0.1.0' } }),
     },
     { overwrite: true },
   )
@@ -61,6 +84,8 @@ export const runInit = async (rawName: string | undefined, opts: InitOptions): P
   log.ok(`Created ${target} from template "${template}".`)
   log.info('Next steps:')
   console.log(`  cd ${targetName}`)
-  console.log('  npm install   (or pnpm/bun install)')
+  if (!globalCli) {
+    console.log('  npm install   (or pnpm/bun install)')
+  }
   console.log('  verso dev')
 }
