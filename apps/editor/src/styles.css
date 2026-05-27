@@ -2118,6 +2118,59 @@ body,
   color: var(--editor-fg-strong);
   border-color: var(--editor-accent);
 }
+.form-clear-btn {
+  font: inherit;
+  font-size: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--editor-border-strong);
+  border-radius: var(--editor-radius-sm);
+  padding: 0.3rem 0.55rem;
+  cursor: pointer;
+  color: var(--editor-muted);
+  align-self: flex-start;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.form-clear-btn:hover {
+  color: var(--editor-fg-strong);
+  border-color: var(--editor-accent);
+}
+
+/* Per-bullet icon picker button. Square 28x28 tile to the right of the
+   text input. Empty state shows a "+" placeholder; set state shows the
+   chosen Phosphor SVG. Hover and is-set states use the editor accent. */
+.form-bullet-row {
+  align-items: center;
+}
+.form-bullet-icon-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--editor-bg);
+  border: 1px solid var(--editor-border-strong);
+  border-radius: var(--editor-radius-sm);
+  color: var(--editor-muted);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  transition: all 120ms ease;
+}
+.form-bullet-icon-btn:hover {
+  border-color: var(--editor-accent);
+  color: var(--editor-fg-strong);
+}
+.form-bullet-icon-btn.is-set {
+  border-color: var(--editor-accent);
+  color: var(--editor-accent);
+}
+.form-bullet-icon-placeholder {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 500;
+  opacity: 0.6;
+}
 
 .form-hint {
   font-size: 0.78rem;

@@ -68,6 +68,51 @@ const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) 
   )
 }
 
+// Smaller variant for per-bullet icon buttons. Shows a "+" placeholder when
+// no icon is set instead of the "?" used for the standalone IconBlock form,
+// because the bullet case starts empty by default and "+" reads as "add one".
+const BulletItemIconPreview = ({
+  name,
+  weight,
+}: {
+  name: string
+  weight: IconWeightOpt
+}) => {
+  const key = `${weight}/${name}`
+  const cached = inspectorSvgCache.get(key)
+  const [, force] = useState(0)
+  if (!name) {
+    return (
+      <span aria-hidden="true" class="form-bullet-icon-placeholder">
+        +
+      </span>
+    )
+  }
+  if (!cached) {
+    const fn = inspectorSvgByKey.get(key)
+    if (fn) {
+      fn()
+        .then((svg) => {
+          inspectorSvgCache.set(key, svg)
+          force((n) => n + 1)
+        })
+        .catch(() => {
+          inspectorSvgCache.set(key, '')
+          force((n) => n + 1)
+        })
+    }
+    return <span aria-hidden="true" style={{ opacity: 0.3 }}>…</span>
+  }
+  return (
+    <span
+      aria-hidden="true"
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: trusted Phosphor SVGs only
+      dangerouslySetInnerHTML={{ __html: cached }}
+      style={{ display: 'inline-flex', width: '18px', height: '18px' }}
+    />
+  )
+}
+
 interface FormProps {
   block: ContentBlock
   onChange: Patch<ContentBlock>
@@ -253,37 +298,94 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
       type BulletItem = string | { text: string; icon?: string; iconWeight?: string; iconTone?: string }
       const items = (((block as any).items as BulletItem[]) ?? [])
       const textOf = (it: BulletItem): string => (typeof it === 'string' ? it : it.text ?? '')
+      const iconOf = (it: BulletItem): string =>
+        typeof it === 'string' ? '' : (it.icon ?? '')
+      const weightOf = (it: BulletItem): string =>
+        typeof it === 'string' ? 'regular' : (it.iconWeight ?? 'regular')
       const update = (next: BulletItem[]) => onChange({ ...block, items: next } as ContentBlock)
+      // Open the icon picker for a specific bullet item. On select, convert
+      // the item to object form (preserving text + any prior icon metadata)
+      // and write the chosen icon name + weight. Clearing returns to string
+      // form when no other metadata is set.
+      const openItemIconPicker = (i: number) => {
+        const cur = items[i]
+        const curText = textOf(cur)
+        iconPickerSeed.value = { name: iconOf(cur), weight: weightOf(cur) }
+        iconPickerCallback.value = ({ name, weight }) => {
+          const next = items.slice()
+          const obj = typeof cur === 'string' || cur === undefined ? { text: curText } : { ...cur }
+          obj.text = curText
+          obj.icon = name
+          obj.iconWeight = weight
+          next[i] = obj
+          update(next)
+        }
+        iconPickerOpen.value = true
+      }
+      const clearItemIcon = (i: number) => {
+        const cur = items[i]
+        if (typeof cur !== 'object' || cur === null) return
+        const next = items.slice()
+        const { icon: _icon, iconWeight: _iw, iconTone: _it, ...rest } = cur
+        // If text is the only remaining field, collapse back to a plain string
+        // for a cleaner JSON shape.
+        const remainingKeys = Object.keys(rest).filter((k) => k !== 'text')
+        next[i] = remainingKeys.length === 0 ? (rest.text ?? '') : (rest as BulletItem)
+        update(next)
+      }
       return (
         <div class="form-list">
           <span class="form-label">Items</span>
-          {items.map((it, i) => (
-            <div class="form-list-row" key={`${i}-${textOf(it)}`}>
-              <input
-                class="form-input"
-                type="text"
-                value={textOf(it)}
-                onInput={(e) => {
-                  const newText = (e.currentTarget as HTMLInputElement).value
-                  const next = items.slice()
-                  const cur = items[i]
-                  next[i] =
-                    typeof cur === 'string' || cur === undefined
-                      ? newText
-                      : { ...cur, text: newText }
-                  update(next)
-                }}
-              />
-              <button
-                type="button"
-                class="form-icon-btn"
-                title="Remove"
-                onClick={() => update(items.filter((_, j) => j !== i))}
-              >
-                ×
-              </button>
-            </div>
-          ))}
+          {items.map((it, i) => {
+            const itemIcon = iconOf(it)
+            const itemWeight = weightOf(it)
+            return (
+              <div class="form-list-row form-bullet-row" key={`${i}-${textOf(it)}`}>
+                <input
+                  class="form-input"
+                  type="text"
+                  value={textOf(it)}
+                  onInput={(e) => {
+                    const newText = (e.currentTarget as HTMLInputElement).value
+                    const next = items.slice()
+                    const cur = items[i]
+                    next[i] =
+                      typeof cur === 'string' || cur === undefined
+                        ? newText
+                        : { ...cur, text: newText }
+                    update(next)
+                  }}
+                />
+                <button
+                  type="button"
+                  class={`form-bullet-icon-btn${itemIcon ? ' is-set' : ''}`}
+                  title={itemIcon ? `Icon: ${itemIcon} (${itemWeight}). Click to change.` : 'Add an icon'}
+                  onClick={() => openItemIconPicker(i)}
+                  aria-label={itemIcon ? `Change icon (currently ${itemIcon})` : 'Add an icon'}
+                >
+                  <BulletItemIconPreview name={itemIcon} weight={itemWeight as IconWeightOpt} />
+                </button>
+                {itemIcon && (
+                  <button
+                    type="button"
+                    class="form-icon-btn"
+                    title="Remove icon"
+                    onClick={() => clearItemIcon(i)}
+                  >
+                    ⌀
+                  </button>
+                )}
+                <button
+                  type="button"
+                  class="form-icon-btn"
+                  title="Remove bullet"
+                  onClick={() => update(items.filter((_, j) => j !== i))}
+                >
+                  ×
+                </button>
+              </div>
+            )
+          })}
           <button
             type="button"
             class="form-add-btn"
@@ -528,7 +630,24 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
       )
 
     case 'card':
-    case 'panel':
+    case 'panel': {
+      const cardIconName = ((block as any).icon as string | undefined) ?? ''
+      const cardIconWeight =
+        ((block as any).iconWeight as string | undefined) ?? 'regular'
+      const openCardIconPicker = () => {
+        iconPickerSeed.value = { name: cardIconName, weight: cardIconWeight }
+        iconPickerCallback.value = ({ name, weight }) => {
+          onChange({ ...block, icon: name, iconWeight: weight } as ContentBlock)
+        }
+        iconPickerOpen.value = true
+      }
+      const clearCardIcon = () => {
+        const next = { ...block } as any
+        delete next.icon
+        delete next.iconWeight
+        delete next.iconTone
+        onChange(next as ContentBlock)
+      }
       return (
         <>
           <SelectRow
@@ -559,11 +678,69 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
               onInput={(v) => onChange({ ...block, bleed: v } as ContentBlock)}
             />
           )}
+          {block.type === 'card' && (
+            <>
+              <TextRow
+                label="Header (optional)"
+                value={(block as any).header ?? ''}
+                onInput={(v) => {
+                  const trimmed = v.trim()
+                  const next = { ...block } as any
+                  if (trimmed) next.header = v
+                  else delete next.header
+                  onChange(next as ContentBlock)
+                }}
+              />
+              <div class="form-row icon-block-picker-row">
+                <span class="form-label">Icon</span>
+                <button
+                  type="button"
+                  class="icon-block-picker-btn"
+                  onClick={openCardIconPicker}
+                  aria-label="Browse icons for card"
+                >
+                  <span class="icon-block-picker-preview">
+                    <IconPreview
+                      name={cardIconName}
+                      weight={cardIconWeight as IconWeightOpt}
+                    />
+                  </span>
+                  <span class="icon-block-picker-meta">
+                    <span class="icon-block-picker-name">
+                      {cardIconName || 'Pick an icon…'}
+                    </span>
+                    <span class="icon-block-picker-weight">{cardIconWeight}</span>
+                  </span>
+                  <span class="icon-block-picker-action">Browse</span>
+                </button>
+              </div>
+              {cardIconName && (
+                <>
+                  <SelectRow
+                    label="Icon tone"
+                    value={(block as any).iconTone ?? ((block as any).tone ?? 'primary')}
+                    options={TONES}
+                    onInput={(v) =>
+                      onChange({ ...block, iconTone: v } as ContentBlock)
+                    }
+                  />
+                  <button
+                    type="button"
+                    class="form-clear-btn"
+                    onClick={clearCardIcon}
+                  >
+                    Remove icon
+                  </button>
+                </>
+              )}
+            </>
+          )}
           <p class="form-hint">
             Inner blocks of a {block.type} are edited via the JSON panel for now.
           </p>
         </>
       )
+    }
 
     default:
       return <p class="form-hint">No form for type "{block.type}". Edit it via the JSON panel.</p>
