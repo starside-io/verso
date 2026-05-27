@@ -1,5 +1,13 @@
 # @starside-io/verso-viewer
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`30789ad`](https://github.com/starside-io/verso/commit/30789ad9d98bd7e37aaa4316ef96aa576a87bc1a)]:
+  - @starside-io/verso-layouts@0.3.1
+  - @starside-io/verso-build@0.2.1
+
 ## 0.3.0
 
 ### Minor Changes
