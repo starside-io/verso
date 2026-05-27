@@ -47,9 +47,9 @@ jobs:
               }
             }
             p.scripts = p.scripts || {};
-            p.scripts.build = 'echo skipping (pre-built from npm)';
-            p.scripts.typecheck = 'echo skipping (no source)';
-            p.scripts.test = 'echo skipping (no source)';
+            p.scripts.build = 'echo skipping verso-build, pre-built from npm';
+            p.scripts.typecheck = 'echo skipping, no source for verso-build on CI';
+            p.scripts.test = 'echo skipping, no source for verso-build on CI';
             fs.writeFileSync('package.json', JSON.stringify(p, null, 2));
           "
 
