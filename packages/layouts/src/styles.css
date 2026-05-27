@@ -923,20 +923,43 @@
   flex-shrink: 0;
 }
 
-/* When cards sit side-by-side in a multi-column layout (two-col, three-col),
-   stretch them to fill their column so siblings in the same row visually
-   match height. Without this, shorter card content makes one card "shorter"
-   than its neighbor and the row looks ragged. Scoped via :has() so it only
-   affects block wrappers that actually contain a card; headings, text, etc.
-   in the same column are left at content height. */
-.layout-three-col .verso-side-content > .verso-block:has(> .verso-card),
-.layout-two-col .verso-side-content > .verso-block:has(> .verso-card) {
+/* Equal-height card row in two-col / three-col layouts.
+   Applies ONLY when every column contains exactly card blocks (no mixed
+   bullets / text / image siblings). Without this guard, a card paired with
+   a bullets block in the other column would stretch into empty space inside
+   its border to match the taller column, which looks like a bug. With the
+   guard, all-card rows still visually align (the "compose the look" case)
+   while mixed-content rows leave cards at their natural height. */
+.layout-two-col
+  .verso-cols:has(.verso-side-content > .verso-block:has(> .verso-card)):not(
+    :has(.verso-side-content > .verso-block:not(:has(> .verso-card)))
+  )
+  .verso-side-content
+  > .verso-block:has(> .verso-card),
+.layout-three-col
+  .verso-cols:has(.verso-side-content > .verso-block:has(> .verso-card)):not(
+    :has(.verso-side-content > .verso-block:not(:has(> .verso-card)))
+  )
+  .verso-side-content
+  > .verso-block:has(> .verso-card) {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
-.layout-three-col .verso-side-content > .verso-block > .verso-card,
-.layout-two-col .verso-side-content > .verso-block > .verso-card {
+.layout-two-col
+  .verso-cols:has(.verso-side-content > .verso-block:has(> .verso-card)):not(
+    :has(.verso-side-content > .verso-block:not(:has(> .verso-card)))
+  )
+  .verso-side-content
+  > .verso-block
+  > .verso-card,
+.layout-three-col
+  .verso-cols:has(.verso-side-content > .verso-block:has(> .verso-card)):not(
+    :has(.verso-side-content > .verso-block:not(:has(> .verso-card)))
+  )
+  .verso-side-content
+  > .verso-block
+  > .verso-card {
   flex: 1;
 }
 .verso-card[data-padding="none"] {
