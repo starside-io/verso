@@ -28,7 +28,7 @@ export {
   CustomBlock,
 } from './block.js'
 export type { IconWeight } from './block.js'
-export { Slide } from './slide.js'
+export { Slide, layoutRequirements } from './slide.js'
 export { Theme, ThemeColors } from './theme.js'
 export {
   Manifest,

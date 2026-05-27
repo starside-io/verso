@@ -2,7 +2,43 @@ import { z } from 'zod'
 import { ContentBlock } from './block.js'
 import { Align, StyleOverrides } from './style.js'
 
-export const Slide = z.object({
+// Per-layout requirements that AI-generated decks routinely get wrong.
+//
+// `minBlocks`: minimum top-level blocks in `content`. Layouts that silently
+// degrade with too few blocks (agenda falls back to deckOutline, full-image
+// just hides the image, etc.) keep their minimum at 0.
+//
+// `mustBeMultipleOf`: top-level block count must be a multiple of N. The
+// twoCol/threeCol layouts split content by midpoint and leave a column empty
+// (or visually unbalanced) when the count doesn't divide evenly. Set with the
+// minimum so we both reject "too few" and "wrong shape" with one rule.
+//
+// `needsImage`: at least one top-level block must have `type: "image"`.
+//
+// `needsHeadingGroups`: at least N top-level heading blocks. The compare and
+// (sometimes) stats layouts use headings to partition content into sides /
+// cells; without enough headings the layout collapses to one side.
+//
+// Layouts not listed here are unconstrained.
+export const layoutRequirements: Record<
+  string,
+  {
+    minBlocks: number
+    mustBeMultipleOf?: number
+    needsImage?: boolean
+    needsHeadingGroups?: number
+  }
+> = {
+  'two-col': { minBlocks: 2, mustBeMultipleOf: 2 },
+  'three-col': { minBlocks: 3, mustBeMultipleOf: 3 },
+  compare: { minBlocks: 2, needsHeadingGroups: 2 },
+  'image-left': { minBlocks: 1, needsImage: true },
+  'image-right': { minBlocks: 1, needsImage: true },
+  stats: { minBlocks: 1 },
+  'big-number': { minBlocks: 1 },
+}
+
+const BaseSlide = z.object({
   id: z.string().min(1),
   header: z.string().optional(),
   title: z.string().optional(),
@@ -27,4 +63,60 @@ export const Slide = z.object({
   style_overrides: StyleOverrides.optional(),
   align: Align.optional(),
 })
+
+// Layout-aware validation runs AFTER the basic field validations succeed.
+// Each rule pushes a fresh ZodIssue with a friendly message that mentions
+// the slide id and the chosen layout, so the editor / build / data-plugin
+// can surface it verbatim.
+export const Slide = BaseSlide.superRefine((slide, ctx) => {
+  const req = layoutRequirements[slide.layout]
+  if (!req) return
+  const count = slide.content.length
+
+  if (count < req.minBlocks) {
+    const noun = req.minBlocks === 1 ? 'block' : 'blocks'
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['content'],
+      message: `Slide "${slide.id}" uses layout "${slide.layout}" but has only ${count} ${count === 1 ? 'block' : 'blocks'}. The ${slide.layout} layout needs at least ${req.minBlocks} ${noun}${columnHint(slide.layout)}.`,
+    })
+    // If the minimum isn't met, the multiple-of / image / heading checks
+    // below would add noise. Stop here.
+    return
+  }
+
+  if (req.mustBeMultipleOf && count % req.mustBeMultipleOf !== 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['content'],
+      message: `Slide "${slide.id}" uses layout "${slide.layout}" but has ${count} blocks. The ${slide.layout} layout splits content evenly across ${req.mustBeMultipleOf} columns, so the block count must be a multiple of ${req.mustBeMultipleOf}. Add or remove a block, or switch to a different layout.`,
+    })
+  }
+
+  if (req.needsImage && !slide.content.some((b) => b.type === 'image')) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['content'],
+      message: `Slide "${slide.id}" uses layout "${slide.layout}" but has no image block. Add a block with type "image" or switch to a different layout.`,
+    })
+  }
+
+  if (req.needsHeadingGroups) {
+    const headings = slide.content.filter((b) => b.type === 'heading').length
+    if (headings < req.needsHeadingGroups) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['content'],
+        message: `Slide "${slide.id}" uses layout "${slide.layout}" but has only ${headings} heading ${headings === 1 ? 'block' : 'blocks'}. The ${slide.layout} layout uses headings to split content into sides; add at least ${req.needsHeadingGroups} heading blocks (one per side).`,
+      })
+    }
+  }
+})
+
+const columnHint = (layout: string): string => {
+  if (layout === 'two-col') return ' (one per column)'
+  if (layout === 'three-col') return ' (one per column)'
+  return ''
+}
+
 export type Slide = z.infer<typeof Slide>

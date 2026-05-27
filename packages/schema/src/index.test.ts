@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Manifest, Slide, Theme } from './index.js'
+import { Manifest, Slide, Theme, layoutRequirements } from './index.js'
 
 describe('Slide schema', () => {
   it('parses a minimal slide and applies defaults', () => {
@@ -30,6 +30,10 @@ describe('Slide schema', () => {
           items: ['As-is mapping', 'Gap analysis'],
           style_overrides: { secondary: '#FFD166' },
         },
+        {
+          type: 'bullets',
+          items: ['Future state', 'Roadmap'],
+        },
       ],
     })
     expect(parsed.path_include).toEqual(['ba'])
@@ -44,6 +48,166 @@ describe('Slide schema', () => {
     const block = parsed.content[0] as { type: string; src: string; text: string }
     expect(block.type).toBe('split-image')
     expect(block.src).toBe('a.png')
+  })
+})
+
+describe('Slide layout validation', () => {
+  it('exposes layoutRequirements for introspection', () => {
+    expect(layoutRequirements['two-col']).toEqual({ minBlocks: 2, mustBeMultipleOf: 2 })
+    expect(layoutRequirements['three-col']).toEqual({ minBlocks: 3, mustBeMultipleOf: 3 })
+    expect(layoutRequirements['image-left']?.needsImage).toBe(true)
+    expect(layoutRequirements.content).toBeUndefined()
+  })
+
+  it('rejects two-col with 1 block (below minimum)', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'half',
+        layout: 'two-col',
+        content: [{ type: 'text', text: 'lonely' }],
+      }),
+    ).toThrow(/two-col.*at least 2 blocks/)
+  })
+
+  it('rejects two-col with 3 blocks (unbalanced split)', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'role',
+        layout: 'two-col',
+        content: [
+          { type: 'text', text: 'a' },
+          { type: 'text', text: 'b' },
+          { type: 'text', text: 'c' },
+        ],
+      }),
+    ).toThrow(/multiple of 2/)
+  })
+
+  it('accepts two-col with 2 blocks', () => {
+    const parsed = Slide.parse({
+      id: 'cot',
+      layout: 'two-col',
+      content: [
+        { type: 'text', text: 'a' },
+        { type: 'text', text: 'b' },
+      ],
+    })
+    expect(parsed.content.length).toBe(2)
+  })
+
+  it('accepts two-col with 4 blocks', () => {
+    const parsed = Slide.parse({
+      id: 'cot4',
+      layout: 'two-col',
+      content: [
+        { type: 'text', text: 'a' },
+        { type: 'text', text: 'b' },
+        { type: 'text', text: 'c' },
+        { type: 'text', text: 'd' },
+      ],
+    })
+    expect(parsed.content.length).toBe(4)
+  })
+
+  it('rejects three-col with 2 blocks (empty column)', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'tc',
+        layout: 'three-col',
+        content: [
+          { type: 'text', text: 'a' },
+          { type: 'text', text: 'b' },
+        ],
+      }),
+    ).toThrow(/three-col.*at least 3/)
+  })
+
+  it('rejects three-col with 4 blocks (must be multiple of 3)', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'tc',
+        layout: 'three-col',
+        content: [
+          { type: 'text', text: 'a' },
+          { type: 'text', text: 'b' },
+          { type: 'text', text: 'c' },
+          { type: 'text', text: 'd' },
+        ],
+      }),
+    ).toThrow(/multiple of 3/)
+  })
+
+  it('rejects image-left without an image block', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'noimg',
+        layout: 'image-left',
+        content: [{ type: 'text', text: 'just words' }],
+      }),
+    ).toThrow(/no image block/)
+  })
+
+  it('accepts image-left with an image block', () => {
+    const parsed = Slide.parse({
+      id: 'img',
+      layout: 'image-left',
+      content: [
+        { type: 'image', src: 'a.png' },
+        { type: 'text', text: 'caption' },
+      ],
+    })
+    expect(parsed.content.length).toBe(2)
+  })
+
+  it('rejects compare with only 1 heading block', () => {
+    expect(() =>
+      Slide.parse({
+        id: 'cmp',
+        layout: 'compare',
+        content: [
+          { type: 'heading', text: 'Pros' },
+          { type: 'text', text: 'good' },
+        ],
+      }),
+    ).toThrow(/heading blocks/)
+  })
+
+  it('accepts compare with 2 heading blocks', () => {
+    const parsed = Slide.parse({
+      id: 'cmp',
+      layout: 'compare',
+      content: [
+        { type: 'heading', text: 'Pros' },
+        { type: 'text', text: 'good' },
+        { type: 'heading', text: 'Cons' },
+        { type: 'text', text: 'bad' },
+      ],
+    })
+    expect(parsed.content.length).toBe(4)
+  })
+
+  it('leaves content layout unconstrained (0 minimum)', () => {
+    const parsed = Slide.parse({ id: 'empty', layout: 'content', content: [] })
+    expect(parsed.content).toEqual([])
+  })
+
+  it('leaves agenda layout unconstrained (falls back to deckOutline)', () => {
+    const parsed = Slide.parse({ id: 'toc', layout: 'agenda', content: [] })
+    expect(parsed.layout).toBe('agenda')
+  })
+
+  it('reports the slide id in the error message', () => {
+    try {
+      Slide.parse({
+        id: 'my-slide',
+        layout: 'two-col',
+        content: [{ type: 'text', text: 'only one' }],
+      })
+      throw new Error('expected throw')
+    } catch (err) {
+      // ZodError.message is a JSON string with escaped quotes around the id.
+      expect((err as Error).message).toMatch(/my-slide/)
+    }
   })
 })
 
