@@ -25,9 +25,11 @@ jobs:
       # to npm, but its source / dist live only on the maintainer's machine).
       # Workspace consumers (apps/viewer, apps/editor) import it via
       # workspace:* so pnpm install needs the directory to exist. We
-      # materialize it from the published npm tarball before install, then
-      # neutralize its build script (dist/ is already populated, so trying
-      # to rebuild it without the source would fail).
+      # materialize it from the published npm tarball before install, then:
+      #   - rewrite sibling deps back to workspace:* so the lockfile (which
+      #     was generated locally with workspace:* deps) still matches
+      #   - neutralize the build / typecheck / test scripts since dist/ is
+      #     already populated and there's no source to rebuild from
       - name: Materialize packages/build from npm
         run: |
           mkdir -p packages/build
@@ -35,7 +37,21 @@ jobs:
           npm pack @starside-io/verso-build@latest
           tar --strip-components=1 -xzf *.tgz
           rm *.tgz
-          node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf-8'));p.scripts=p.scripts||{};p.scripts.build='echo skipping (pre-built from npm)';p.scripts.typecheck='echo skipping (no source)';p.scripts.test='echo skipping (no source)';fs.writeFileSync('package.json',JSON.stringify(p,null,2));"
+          node -e "
+            const fs=require('fs');
+            const p=JSON.parse(fs.readFileSync('package.json','utf-8'));
+            for (const field of ['dependencies','devDependencies','peerDependencies']) {
+              if (!p[field]) continue;
+              for (const dep of Object.keys(p[field])) {
+                if (dep.startsWith('@starside-io/')) p[field][dep] = 'workspace:*';
+              }
+            }
+            p.scripts = p.scripts || {};
+            p.scripts.build = 'echo skipping (pre-built from npm)';
+            p.scripts.typecheck = 'echo skipping (no source)';
+            p.scripts.test = 'echo skipping (no source)';
+            fs.writeFileSync('package.json', JSON.stringify(p, null, 2));
+          "
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
