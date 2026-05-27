@@ -186,6 +186,19 @@ export const pdfBuilding = signal(false)
 export const htmlExportOpen = signal(false)
 export const htmlExportRunner = signal<((inlineImages: boolean) => void) | null>(null)
 
+// Slide overflow detection. The viewer iframe (apps/viewer) measures the
+// rendered `.verso-slide` scrollHeight against the 1080px design height and
+// postMessages a `verso:overflow` payload back here whenever the active slide
+// would be clipped in PDF/HTML/PNG export. We keep the running map keyed by
+// slide id; the latest report from the viewer wins. Empty array clears the
+// active slide's entry (we only ever know about the visible slide).
+export const slideOverflows = signal<Map<string, number>>(new Map())
+
+export interface OverflowMessage {
+  type: 'verso:overflow'
+  overflows: Array<{ slideId: string; scrollHeight: number; overshoot: number }>
+}
+
 // Editing target. Path is an array of indices into `slide.content` (recursive
 // for cards/panels). Empty array = root slide; e.g. [2, 0] = first child of
 // the third top-level block.
@@ -553,7 +566,50 @@ export const removeSlide = async (id: string): Promise<void> => {
   }
 }
 
+// Overflow message listener. Mounted once on bootstrap so the viewer iframe
+// can push `verso:overflow` payloads at us. The viewer only ever knows about
+// the visible slide, so an empty overflows array means "clear the current
+// slide's entry"; a populated one updates that slide's overshoot.
+let overflowListenerInstalled = false
+const installOverflowListener = (): void => {
+  if (overflowListenerInstalled || typeof window === 'undefined') return
+  overflowListenerInstalled = true
+  window.addEventListener('message', (e: MessageEvent) => {
+    const data = e.data as OverflowMessage | { type?: string } | null
+    if (!data || data.type !== 'verso:overflow') return
+    const incoming = (data as OverflowMessage).overflows
+    if (!Array.isArray(incoming)) return
+    const current = slideOverflows.value
+    const next = new Map(current)
+    if (incoming.length === 0) {
+      // Empty report. Clear the active slide so a slide that no longer
+      // overflows after an edit drops its badge.
+      const id = activeSlideId.value
+      if (id && next.has(id)) {
+        next.delete(id)
+        slideOverflows.value = next
+      }
+      return
+    }
+    let changed = false
+    for (const o of incoming) {
+      if (!o || typeof o.slideId !== 'string') continue
+      if (o.overshoot > 0) {
+        if (next.get(o.slideId) !== o.overshoot) {
+          next.set(o.slideId, o.overshoot)
+          changed = true
+        }
+      } else if (next.has(o.slideId)) {
+        next.delete(o.slideId)
+        changed = true
+      }
+    }
+    if (changed) slideOverflows.value = next
+  })
+}
+
 export const bootstrap = async (): Promise<void> => {
+  installOverflowListener()
   try {
     const [m, s, t] = await Promise.all([fetchManifest(), fetchSlides(), fetchThemes()])
     manifest.value = m

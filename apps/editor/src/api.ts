@@ -92,30 +92,43 @@ export interface BuildPdfFile {
   slides: number
 }
 
+/**
+ * One entry per slide whose rendered content exceeded the configured page
+ * height. Populated by the build pipeline (see @starside-io/verso-build).
+ * Optional everywhere so older viewers / proxies don't break consumers.
+ */
+export interface SlideOverflow {
+  pathId: string
+  slideId: string
+  scrollHeight: number
+  overshoot: number
+}
+
 export const buildPdf = (
   pathId?: string,
   options?: { open?: boolean },
-): Promise<{ files: BuildPdfFile[] }> =>
+): Promise<{ files: BuildPdfFile[]; overflows?: SlideOverflow[] }> =>
   send('/__verso/build-pdf', 'POST', {
     ...(pathId ? { pathId } : {}),
     ...(options?.open ? { open: true } : {}),
-  }) as Promise<{ files: BuildPdfFile[] }>
+  }) as Promise<{ files: BuildPdfFile[]; overflows?: SlideOverflow[] }>
 
 export const buildHtml = (
   pathId?: string,
   options?: { open?: boolean; inlineImages?: boolean },
-): Promise<{ files: BuildPdfFile[] }> =>
+): Promise<{ files: BuildPdfFile[]; overflows?: SlideOverflow[] }> =>
   send('/__verso/build-html', 'POST', {
     ...(pathId ? { pathId } : {}),
     ...(options?.open ? { open: true } : {}),
     ...(options?.inlineImages === false ? { inlineImages: false } : {}),
-  }) as Promise<{ files: BuildPdfFile[] }>
+  }) as Promise<{ files: BuildPdfFile[]; overflows?: SlideOverflow[] }>
 
 export interface BuildPngFile {
   pathId: string
   slideId: string
   file: string
   bytes: number
+  overflows?: SlideOverflow[]
 }
 
 export const buildPng = (

@@ -108,7 +108,78 @@ const bootstrap = async () => {
   // editor parent window. Activated via ?edit=1 (set by the editor's iframe).
   if (params.get('edit') === '1') {
     enableEditBridge()
+    enableOverflowReporter()
   }
+}
+
+/**
+ * Editor-side overflow detection. The CLI's build pipeline measures
+ * `.verso-slide` scrollHeight against the configured page height and warns
+ * authors when content gets clipped. We do the same thing live in the
+ * viewer iframe and postMessage the report up to the editor so it can show
+ * a badge in the slide list and a chip in the toolbar.
+ *
+ * The viewer renders one slide at a time, so we only ever report the active
+ * slide. The editor merges incoming reports into a Map<slideId, overshoot>.
+ * Re-measures after every navigate (MutationObserver) and on a debounced
+ * window resize.
+ */
+const enableOverflowReporter = (): void => {
+  const editorTarget = (): Window | null =>
+    window.parent && window.parent !== window ? window.parent : null
+
+  // Treat 1080 as the design height. The CLI uses the configured page size,
+  // but the editor preview always runs at 16:9 (1920x1080) per the layouts
+  // and renderer convention. Keeping this hard-coded avoids round-tripping
+  // the page size through bootstrap.
+  const PAGE_HEIGHT = 1080
+
+  const measureAndReport = () => {
+    const slide = document.querySelector<HTMLElement>('.verso-slide')
+    const target = editorTarget()
+    if (!target) return
+    if (!slide) {
+      target.postMessage({ type: 'verso:overflow', overflows: [] }, '*')
+      return
+    }
+    const slideId = slide.getAttribute('data-slide-id') ?? ''
+    const sh = slide.scrollHeight
+    const overshoot = sh > PAGE_HEIGHT ? sh - PAGE_HEIGHT : 0
+    target.postMessage(
+      {
+        type: 'verso:overflow',
+        overflows: overshoot > 0 ? [{ slideId, scrollHeight: sh, overshoot }] : [],
+      },
+      '*',
+    )
+  }
+
+  // Wait for layout + fonts before measuring. Initial pass.
+  const initial = () => {
+    requestAnimationFrame(() => requestAnimationFrame(measureAndReport))
+  }
+  initial()
+
+  // Re-measure after every render (slide change). MutationObserver fires
+  // whenever the runtime swaps innerHTML on the root.
+  let pending = false
+  const obs = new MutationObserver(() => {
+    if (pending) return
+    pending = true
+    requestAnimationFrame(() => {
+      pending = false
+      measureAndReport()
+    })
+  })
+  obs.observe(document.body, { childList: true, subtree: true })
+
+  // Debounced resize. Resizing the iframe can change wrap points on
+  // text-heavy slides, so re-measure after the resize settles.
+  let resizeTimer: ReturnType<typeof setTimeout> | null = null
+  window.addEventListener('resize', () => {
+    if (resizeTimer) clearTimeout(resizeTimer)
+    resizeTimer = setTimeout(measureAndReport, 150)
+  })
 }
 
 const enableEditBridge = () => {

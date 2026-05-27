@@ -15,6 +15,7 @@ import {
   renameSection,
   setSlideOrder,
   slideGroups,
+  slideOverflows,
   slideSearchOpen,
 } from '../state'
 
@@ -50,6 +51,7 @@ export const SlideList = () => {
   const active = activeSlideId.value
   const filter = filterPathId.value
   const isLoaded = loaded.value
+  const overflows = slideOverflows.value
   const [dragId, setDragId] = useState<string | null>(null)
   const [dropOverId, setDropOverId] = useState<string | null>(null)
   const [renamingId, setRenamingId] = useState<string | null>(null)
@@ -129,6 +131,7 @@ export const SlideList = () => {
     const isDropTarget = slide.id === dropOverId && dragId && dragId !== slide.id
     const isDimmed = filter !== null && !slideInPath(slide, filter)
     const isHighlighted = filter !== null && slideInPath(slide, filter)
+    const overshoot = overflows.get(slide.id) ?? 0
     const slidePaths =
       allPathIds.length > 0 && m
         ? allPathIds
@@ -187,6 +190,15 @@ export const SlideList = () => {
           <div class="slide-list-title">{slide.title ?? slide.id}</div>
           <div class="slide-list-sub">{slide.layout}</div>
         </div>
+        {overshoot > 0 && (
+          <span
+            class="slide-list-overflow"
+            title={`Overflows by ${overshoot}px, content is cut in PDF / HTML export`}
+            aria-label={`Slide overflows by ${overshoot} pixels`}
+          >
+            !
+          </span>
+        )}
         {slidePaths.length > 0 && (
           <div class="slide-list-paths">
             {slidePaths.slice(0, 4).map((p) => (

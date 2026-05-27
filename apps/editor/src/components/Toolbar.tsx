@@ -1,4 +1,9 @@
-import { type HorizontalAlign, Slide, type VerticalAlign } from '@starside-io/verso-schema'
+import {
+  type Align,
+  type HorizontalAlign,
+  Slide,
+  type VerticalAlign,
+} from '@starside-io/verso-schema'
 import { buildHtml, buildPdf, buildPng, presentUrl } from '../api'
 import { BLOCK_CATEGORIES, BLOCK_MENU } from '../blocks'
 import { BUILT_IN_LAYOUTS } from '../layouts'
@@ -20,6 +25,7 @@ import {
   pdfBuilding,
   redo,
   rightTab,
+  slideOverflows,
   status,
   toggleEditorTheme,
   undo,
@@ -46,6 +52,56 @@ const VERTICAL: VerticalAlign[] = ['top', 'middle', 'bottom']
 
 const layoutCategories = Array.from(new Set(BUILT_IN_LAYOUTS.map((l) => l.category)))
 
+// Collapse `align` to its smallest equivalent shape.
+//   - drop empty per-zone wrappers ({} is noise on disk)
+//   - if title and content fully agree on both axes, collapse the matching
+//     values into the flat top-level horizontal/vertical and drop the
+//     wrappers (so users who don't use per-zone alignment never see it)
+//   - return undefined when nothing meaningful is set
+const normalizeAlign = (align: Align): Align | undefined => {
+  const next: Align = { ...align }
+  if (next.title && Object.keys(next.title).length === 0) delete next.title
+  if (next.content && Object.keys(next.content).length === 0) delete next.content
+
+  const t = next.title
+  const c = next.content
+  if (t && c) {
+    const sameH = t.horizontal !== undefined && t.horizontal === c.horizontal
+    const sameV = t.vertical !== undefined && t.vertical === c.vertical
+    if (sameH && sameV) {
+      next.horizontal = t.horizontal
+      next.vertical = t.vertical
+      delete next.title
+      delete next.content
+    }
+  }
+
+  if (
+    next.horizontal === undefined &&
+    next.vertical === undefined &&
+    next.title === undefined &&
+    next.content === undefined
+  ) {
+    return undefined
+  }
+  return next
+}
+
+// What value should each row's segmented buttons highlight? Per-zone wins
+// over flat; if neither is set, return undefined so no button looks active.
+// (We intentionally don't fall through to layout defaults: the editor would
+//  have to import the layouts package to learn them, and a missing highlight
+//  is a clearer "nothing set" signal anyway.)
+const alignForZone = (
+  align: Align | undefined,
+  zone: 'title' | 'content',
+  axis: 'horizontal' | 'vertical',
+): HorizontalAlign | VerticalAlign | undefined => {
+  if (!align) return undefined
+  const z = align[zone]
+  return (z?.[axis] as HorizontalAlign | VerticalAlign | undefined) ?? align[axis]
+}
+
 export const Toolbar = () => {
   const s = status.value
   const slide = activeSlide.value
@@ -59,13 +115,20 @@ export const Toolbar = () => {
     if (id) void addSlide(id)
   }
 
+  // After an export the build returns an `overflows` list (slides that get
+  // clipped at the configured page height). Surface the count in the success
+  // message so the author notices without us blocking the build.
+  const overflowSuffix = (n: number): string =>
+    n > 0 ? `, ${n} slide${n === 1 ? '' : 's'} overflow` : ''
+
   const exportPdf = async () => {
     pdfBuilding.value = true
     status.value = { kind: 'saving', message: 'Building PDF…' }
     try {
       const res = await buildPdf(activePathId.value, { open: true })
       const f = res.files[0]
-      if (f) flashOk(`PDF: ${f.file} (${f.slides} slides)`, 4000)
+      const n = res.overflows?.length ?? 0
+      if (f) flashOk(`PDF: ${f.file} (${f.slides} slides${overflowSuffix(n)})`, 4000)
     } catch (err) {
       status.value = { kind: 'error', message: `PDF failed: ${(err as Error).message}` }
     } finally {
@@ -82,7 +145,8 @@ export const Toolbar = () => {
     try {
       const res = await buildHtml(activePathId.value, { open: true, inlineImages })
       const f = res.files[0]
-      if (f) flashOk(`HTML: ${f.file} (${f.slides} slides)`, 4000)
+      const n = res.overflows?.length ?? 0
+      if (f) flashOk(`HTML: ${f.file} (${f.slides} slides${overflowSuffix(n)})`, 4000)
     } catch (err) {
       status.value = { kind: 'error', message: `HTML failed: ${(err as Error).message}` }
     } finally {
@@ -100,7 +164,8 @@ export const Toolbar = () => {
     status.value = { kind: 'saving', message: `Rendering ${slideId} as PNG…` }
     try {
       const f = await buildPng(activePathId.value, slideId, { open: true })
-      flashOk(`PNG: ${f.file}`, 4000)
+      const n = f.overflows?.length ?? 0
+      flashOk(`PNG: ${f.file}${overflowSuffix(n)}`, 4000)
     } catch (err) {
       status.value = { kind: 'error', message: `PNG failed: ${(err as Error).message}` }
     } finally {
@@ -113,11 +178,22 @@ export const Toolbar = () => {
     void updateActiveSlide((s) => Slide.parse({ ...s, layout: name }))
   }
 
-  const onPickAlign = (axis: 'horizontal' | 'vertical', value: string, close: () => void) => {
+  // Per-zone alignment writes go into align.title.* or align.content.*.
+  // After every write we run normalizeAlign which collapses to the flat
+  // shape when both zones agree (keeps the JSON clean for the common case)
+  // and drops empty wrappers (so { title: {} } never lingers).
+  const onPickAlign = (
+    zone: 'title' | 'content',
+    axis: 'horizontal' | 'vertical',
+    value: HorizontalAlign | VerticalAlign,
+    close: () => void,
+  ) => {
     close()
     void updateActiveSlide((s) => {
-      const align = { ...(s.align ?? {}), [axis]: value }
-      return Slide.parse({ ...s, align })
+      const prev: Align = s.align ?? {}
+      const zoneVal = { ...(prev[zone] ?? {}), [axis]: value }
+      const next = normalizeAlign({ ...prev, [zone]: zoneVal })
+      return Slide.parse({ ...s, align: next })
     })
   }
 
@@ -216,40 +292,54 @@ export const Toolbar = () => {
         }
         disabled={disabled}
       >
-        {(close) => (
-          <div class="dropdown-align">
-            <div class="align-row">
-              <span class="align-row-label">Horizontal</span>
-              <div class="align-segmented">
-                {HORIZONTAL.map((h) => (
-                  <button
-                    type="button"
-                    key={h}
-                    class={`align-btn${slide?.align?.horizontal === h ? ' is-active' : ''}`}
-                    onClick={() => onPickAlign('horizontal', h, close)}
-                  >
-                    {h}
-                  </button>
-                ))}
+        {(close) => {
+          const align = slide?.align
+          const renderZone = (zone: 'title' | 'content', heading: string) => (
+            <div class="align-zone" key={zone}>
+              <div class="align-zone-label">{heading}</div>
+              <div class="align-row">
+                <span class="align-row-label">Horizontal</span>
+                <div class="align-segmented">
+                  {HORIZONTAL.map((h) => (
+                    <button
+                      type="button"
+                      key={h}
+                      class={`align-btn${
+                        alignForZone(align, zone, 'horizontal') === h ? ' is-active' : ''
+                      }`}
+                      onClick={() => onPickAlign(zone, 'horizontal', h, close)}
+                    >
+                      {h}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div class="align-row">
+                <span class="align-row-label">Vertical</span>
+                <div class="align-segmented">
+                  {VERTICAL.map((v) => (
+                    <button
+                      type="button"
+                      key={v}
+                      class={`align-btn${
+                        alignForZone(align, zone, 'vertical') === v ? ' is-active' : ''
+                      }`}
+                      onClick={() => onPickAlign(zone, 'vertical', v, close)}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div class="align-row">
-              <span class="align-row-label">Vertical</span>
-              <div class="align-segmented">
-                {VERTICAL.map((v) => (
-                  <button
-                    type="button"
-                    key={v}
-                    class={`align-btn${slide?.align?.vertical === v ? ' is-active' : ''}`}
-                    onClick={() => onPickAlign('vertical', v, close)}
-                  >
-                    {v}
-                  </button>
-                ))}
-              </div>
+          )
+          return (
+            <div class="dropdown-align">
+              {renderZone('title', 'Title')}
+              {renderZone('content', 'Content')}
             </div>
-          </div>
-        )}
+          )
+        }}
       </Dropdown>
 
       <button
@@ -432,6 +522,20 @@ export const Toolbar = () => {
           {s.message ?? (s.kind === 'saving' ? 'Saving…' : '')}
         </span>
       )}
+
+      {(() => {
+        const id = activeSlideId.value
+        const overshoot = id ? (slideOverflows.value.get(id) ?? 0) : 0
+        if (overshoot <= 0) return null
+        return (
+          <span
+            class="status-pill status-overflow"
+            title="The active slide overflows the 1080px design height. Content past the bound is clipped in PDF and HTML export."
+          >
+            ⚠ active slide overflows by {overshoot}px
+          </span>
+        )
+      })()}
 
       <button
         type="button"
