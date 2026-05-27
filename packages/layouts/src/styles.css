@@ -52,7 +52,11 @@
   min-height: 0;
 }
 
-/* Vertical alignment of the layout's children */
+/* Vertical alignment of the layout's children (back-compat path).
+   Every multi-zone layout ALSO stamps `data-v` on its root via the content
+   zone's resolved vertical alignment. Single-zone layouts (cover, section,
+   closing, quote, full-image) only have these flat data attrs because they
+   don't split header+title from content. */
 
 .layout-content[data-v="top"],
 .layout-two-col[data-v="top"],
@@ -109,7 +113,7 @@
   justify-content: flex-end;
 }
 
-/* Horizontal alignment */
+/* Horizontal alignment. */
 
 .layout-content[data-h="center"],
 .layout-two-col[data-h="center"],
@@ -169,10 +173,72 @@
   align-items: flex-start;
 }
 
-/* Centered hero bullets need their pseudo-bar removed and centering on the list itself */
-
+/* Centered hero / content bullets keep the list block-level + left-internal. */
 .layout-hero[data-h="center"] .verso-bullets,
 .layout-content[data-h="center"] .verso-bullets {
+  display: inline-block;
+  text-align: left;
+}
+
+/* Per-zone alignment (PowerPoint-style). Triggered by `.has-zones` on the
+   layout root, which the renderer adds only when the slide opts into
+   per-zone alignment via `align.title` or `align.content`. When present,
+   the content-zone takes the leftover vertical space via flex:1 and applies
+   its own justify-content based on data-v-content, while the title-zone
+   sits at its natural height with its own horizontal alignment. The root's
+   own data-h / data-v are still set (to the content-zone's values) but the
+   per-zone rules below win where they apply. */
+
+.has-zones .verso-title-zone {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.has-zones .verso-title-zone[data-h-title="left"] {
+  align-items: flex-start;
+  text-align: left;
+}
+.has-zones .verso-title-zone[data-h-title="center"] {
+  align-items: center;
+  text-align: center;
+}
+.has-zones .verso-title-zone[data-h-title="right"] {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.has-zones .verso-content-zone {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.has-zones .verso-content-zone[data-h-content="left"] {
+  align-items: flex-start;
+  text-align: left;
+}
+.has-zones .verso-content-zone[data-h-content="center"] {
+  align-items: center;
+  text-align: center;
+}
+.has-zones .verso-content-zone[data-h-content="right"] {
+  align-items: flex-end;
+  text-align: right;
+}
+.has-zones .verso-content-zone[data-v-content="top"] {
+  justify-content: flex-start;
+}
+.has-zones .verso-content-zone[data-v-content="middle"] {
+  justify-content: center;
+}
+.has-zones .verso-content-zone[data-v-content="bottom"] {
+  justify-content: flex-end;
+}
+
+/* Centered bullets in multi-zone (per-zone) layouts: keep the list block-level
+   but inline-aligned so the dots don't jump to the column center. */
+.has-zones .verso-content-zone[data-h-content="center"] .verso-bullets {
   display: inline-block;
   text-align: left;
 }
@@ -228,12 +294,18 @@
   min-height: 0;
 }
 
+/* Side content groups (used by two-col, three-col, image-left, image-right,
+   compare, author) align their inner blocks vertically. Two paths:
+   (1) back-compat: alignment lives on the layout root via data-v;
+   (2) per-zone: alignment lives on the .verso-content-zone wrapper. */
+
 .layout-image-left[data-v="top"] .verso-side-content,
 .layout-image-right[data-v="top"] .verso-side-content,
 .layout-two-col[data-v="top"] .verso-side-content,
 .layout-three-col[data-v="top"] .verso-side-content,
 .layout-compare[data-v="top"] .verso-side-content,
-.layout-author[data-v="top"] .verso-side-content {
+.layout-author[data-v="top"] .verso-side-content,
+.verso-content-zone[data-v-content="top"] .verso-side-content {
   justify-content: flex-start;
 }
 
@@ -242,7 +314,8 @@
 .layout-two-col[data-v="middle"] .verso-side-content,
 .layout-three-col[data-v="middle"] .verso-side-content,
 .layout-compare[data-v="middle"] .verso-side-content,
-.layout-author[data-v="middle"] .verso-side-content {
+.layout-author[data-v="middle"] .verso-side-content,
+.verso-content-zone[data-v-content="middle"] .verso-side-content {
   justify-content: center;
 }
 
@@ -251,7 +324,8 @@
 .layout-two-col[data-v="bottom"] .verso-side-content,
 .layout-three-col[data-v="bottom"] .verso-side-content,
 .layout-compare[data-v="bottom"] .verso-side-content,
-.layout-author[data-v="bottom"] .verso-side-content {
+.layout-author[data-v="bottom"] .verso-side-content,
+.verso-content-zone[data-v-content="bottom"] .verso-side-content {
   justify-content: flex-end;
 }
 
@@ -273,7 +347,8 @@
   max-width: 60ch;
   line-height: 1.5;
 }
-.layout-hero[data-h="center"] .verso-hero-body {
+.layout-hero[data-h="center"] .verso-hero-body,
+.layout-hero .verso-content-zone[data-h-content="center"] .verso-hero-body {
   margin-left: auto;
   margin-right: auto;
 }
@@ -403,7 +478,8 @@
   flex-direction: column;
   gap: 0.5rem;
 }
-.layout-agenda[data-h="center"] .verso-agenda {
+.layout-agenda[data-h="center"] .verso-agenda,
+.layout-agenda .verso-content-zone[data-h-content="center"] .verso-agenda {
   margin-left: auto;
   margin-right: auto;
 }
@@ -557,7 +633,8 @@
   color: var(--color-secondary);
   max-width: 50ch;
 }
-.layout-big-number[data-h="center"] .verso-big-number-body {
+.layout-big-number[data-h="center"] .verso-big-number-body,
+.layout-big-number .verso-content-zone[data-h-content="center"] .verso-big-number-body {
   margin-left: auto;
   margin-right: auto;
 }
@@ -814,6 +891,23 @@
   flex-direction: column;
   gap: 0.5rem;
   min-width: 0;
+}
+
+/* When cards sit side-by-side in a multi-column layout (two-col, three-col),
+   stretch them to fill their column so siblings in the same row visually
+   match height. Without this, shorter card content makes one card "shorter"
+   than its neighbor and the row looks ragged. Scoped via :has() so it only
+   affects block wrappers that actually contain a card; headings, text, etc.
+   in the same column are left at content height. */
+.layout-three-col .verso-side-content > .verso-block:has(> .verso-card),
+.layout-two-col .verso-side-content > .verso-block:has(> .verso-card) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.layout-three-col .verso-side-content > .verso-block > .verso-card,
+.layout-two-col .verso-side-content > .verso-block > .verso-card {
+  flex: 1;
 }
 .verso-card[data-padding="none"] {
   padding: 0;

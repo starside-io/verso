@@ -1,14 +1,15 @@
 import { type LayoutContext, defineLayout, html } from '@starside-io/verso-runtime'
-import type {
-  Align,
-  BulletsBlock,
-  ContentBlock,
-  HeadingBlock,
-  HorizontalAlign,
-  ImageBlock,
-  QuoteBlock,
-  Slide,
-  VerticalAlign,
+import {
+  type Align,
+  type BulletsBlock,
+  type ContentBlock,
+  type HeadingBlock,
+  type HorizontalAlign,
+  type ImageBlock,
+  type QuoteBlock,
+  type Slide,
+  type VerticalAlign,
+  resolveZoneAlign,
 } from '@starside-io/verso-schema'
 
 interface AlignDefaults {
@@ -16,6 +17,11 @@ interface AlignDefaults {
   vertical: VerticalAlign
 }
 
+// Flat resolver used for the root layout container. When the slide opts into
+// per-zone alignment (align.title / align.content set), the renderer instead
+// wraps header+title in `.verso-title-zone` and the blocks in
+// `.verso-content-zone` so each can be aligned independently. See
+// `resolveZoneAlign` and the `has-zones` CSS in styles.css.
 const resolveAlign = (
   override: Align | undefined,
   defaults: AlignDefaults,
@@ -29,6 +35,29 @@ const headerBlock = (slide: Slide) =>
 
 const titleBlock = (slide: Slide, className = 'verso-title') =>
   slide.title ? html`<h1 class="${className}">${slide.title}</h1>` : ''
+
+// Per-zone wrappers. Only emitted when the slide opts into per-zone alignment
+// (align.title or align.content set). Empty wrappers degrade gracefully if
+// the slide has neither header nor title (we still emit the zone so the
+// content-zone keeps a known sibling for the per-zone CSS rules).
+const titleZone = (slide: Slide, h: HorizontalAlign, v: VerticalAlign, titleClass = 'verso-title') =>
+  html`
+    <div class="verso-title-zone" data-h-title="${h}" data-v-title="${v}">
+      ${headerBlock(slide)}
+      ${slide.title ? html`<h1 class="${titleClass}">${slide.title}</h1>` : ''}
+    </div>
+  `
+
+const contentZone = (
+  inner: unknown,
+  h: HorizontalAlign,
+  v: VerticalAlign,
+) =>
+  html`
+    <div class="verso-content-zone" data-h-content="${h}" data-v-content="${v}">
+      ${inner}
+    </div>
+  `
 
 const splitImageAndRest = (
   blocks: readonly ContentBlock[],
@@ -100,9 +129,21 @@ const splitIntoColumns = (blocks: readonly ContentBlock[], n: number): IndexedBl
 export const content = defineLayout({
   name: 'content',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    if (z.perZone) {
+      return html`
+        <div class="layout-content has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(
+            html`<div class="verso-content">${renderBlocks(ctx.blocks, ctx)}</div>`,
+            z.content.horizontal,
+            z.content.vertical,
+          )}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-content" data-h="${h}" data-v="${v}">
+      <div class="layout-content" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         <div class="verso-stack">
           ${headerBlock(slide)}
           ${titleBlock(slide)}
@@ -116,18 +157,29 @@ export const content = defineLayout({
 export const twoCol = defineLayout({
   name: 'two-col',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
     const half = Math.ceil(ctx.blocks.length / 2)
     const left = sliceIndexed(ctx.blocks, 0, half)
     const right = sliceIndexed(ctx.blocks, half, ctx.blocks.length)
+    const cols = html`
+      <div class="verso-cols">
+        <div class="verso-col"><div class="verso-side-content">${renderIndexed(left, ctx)}</div></div>
+        <div class="verso-col"><div class="verso-side-content">${renderIndexed(right, ctx)}</div></div>
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-two-col has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(cols, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-two-col" data-h="${h}" data-v="${v}">
+      <div class="layout-two-col" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-cols">
-          <div class="verso-col"><div class="verso-side-content">${renderIndexed(left, ctx)}</div></div>
-          <div class="verso-col"><div class="verso-side-content">${renderIndexed(right, ctx)}</div></div>
-        </div>
+        ${cols}
       </div>
     `
   },
@@ -136,16 +188,27 @@ export const twoCol = defineLayout({
 export const imageLeft = defineLayout({
   name: 'image-left',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
     const { image, imageIdx, rest } = splitImageAndRest(ctx.blocks)
+    const cols = html`
+      <div class="verso-cols">
+        <div class="verso-image-side"><div class="verso-side-content">${image ? ctx.block(image, [imageIdx]) : ''}</div></div>
+        <div class="verso-text-side"><div class="verso-side-content">${renderIndexed(rest, ctx)}</div></div>
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-image-left has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(cols, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-image-left" data-h="${h}" data-v="${v}">
+      <div class="layout-image-left" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-cols">
-          <div class="verso-image-side"><div class="verso-side-content">${image ? ctx.block(image, [imageIdx]) : ''}</div></div>
-          <div class="verso-text-side"><div class="verso-side-content">${renderIndexed(rest, ctx)}</div></div>
-        </div>
+        ${cols}
       </div>
     `
   },
@@ -154,16 +217,27 @@ export const imageLeft = defineLayout({
 export const imageRight = defineLayout({
   name: 'image-right',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
     const { image, imageIdx, rest } = splitImageAndRest(ctx.blocks)
+    const cols = html`
+      <div class="verso-cols">
+        <div class="verso-text-side"><div class="verso-side-content">${renderIndexed(rest, ctx)}</div></div>
+        <div class="verso-image-side"><div class="verso-side-content">${image ? ctx.block(image, [imageIdx]) : ''}</div></div>
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-image-right has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(cols, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-image-right" data-h="${h}" data-v="${v}">
+      <div class="layout-image-right" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-cols">
-          <div class="verso-text-side"><div class="verso-side-content">${renderIndexed(rest, ctx)}</div></div>
-          <div class="verso-image-side"><div class="verso-side-content">${image ? ctx.block(image, [imageIdx]) : ''}</div></div>
-        </div>
+        ${cols}
       </div>
     `
   },
@@ -172,9 +246,21 @@ export const imageRight = defineLayout({
 export const hero = defineLayout({
   name: 'hero',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    if (z.perZone) {
+      return html`
+        <div class="layout-hero has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical, 'verso-hero-title')}
+          ${contentZone(
+            html`<div class="verso-hero-body">${renderBlocks(ctx.blocks, ctx)}</div>`,
+            z.content.horizontal,
+            z.content.vertical,
+          )}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-hero" data-h="${h}" data-v="${v}">
+      <div class="layout-hero" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         <div class="verso-stack">
           ${headerBlock(slide)}
           ${slide.title ? html`<h1 class="verso-hero-title">${slide.title}</h1>` : ''}
@@ -240,7 +326,7 @@ export const section = defineLayout({
 export const agenda = defineLayout({
   name: 'agenda',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
 
     // 1. Manual `bullets` block always wins (lets the author override the
     //    auto agenda for a specific slide).
@@ -278,16 +364,29 @@ export const agenda = defineLayout({
     // Thresholds tuned for a 1920x1080 deck with the layout's default padding.
     const density = items.length <= 8 ? 'sparse' : items.length <= 20 ? 'medium' : 'dense'
 
+    const list = html`
+      <ol class="verso-agenda">
+        ${items.map(
+          (it) =>
+            html`<li class="verso-agenda-item${it.isSection ? ' is-section' : ''}">${it.text}</li>`,
+        )}
+      </ol>
+    `
+
+    if (z.perZone) {
+      return html`
+        <div class="layout-agenda has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}" data-density="${density}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(list, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
+
     return html`
-      <div class="layout-agenda" data-h="${h}" data-v="${v}" data-density="${density}">
+      <div class="layout-agenda" data-h="${z.content.horizontal}" data-v="${z.content.vertical}" data-density="${density}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <ol class="verso-agenda">
-          ${items.map(
-            (it) =>
-              html`<li class="verso-agenda-item${it.isSection ? ' is-section' : ''}">${it.text}</li>`,
-          )}
-        </ol>
+        ${list}
       </div>
     `
   },
@@ -296,21 +395,32 @@ export const agenda = defineLayout({
 export const threeCol = defineLayout({
   name: 'three-col',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
     const cols = splitIntoColumns(ctx.blocks, 3)
+    const grid = html`
+      <div class="verso-cols verso-cols-3">
+        ${cols.map(
+          (col) => html`
+            <div class="verso-col">
+              <div class="verso-side-content">${renderIndexed(col, ctx)}</div>
+            </div>
+          `,
+        )}
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-three-col has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(grid, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-three-col" data-h="${h}" data-v="${v}">
+      <div class="layout-three-col" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-cols verso-cols-3">
-          ${cols.map(
-            (col) => html`
-              <div class="verso-col">
-                <div class="verso-side-content">${renderIndexed(col, ctx)}</div>
-              </div>
-            `,
-          )}
-        </div>
+        ${grid}
       </div>
     `
   },
@@ -319,7 +429,7 @@ export const threeCol = defineLayout({
 export const compare = defineLayout({
   name: 'compare',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
     const groups = groupByHeading(ctx.blocks)
     const left = groups[0]
     const right = groups[1]
@@ -329,14 +439,25 @@ export const compare = defineLayout({
         <div class="verso-side-content">${g ? renderIndexed(g.body, ctx) : ''}</div>
       </div>
     `
+    const grid = html`
+      <div class="verso-cols verso-compare-cols">
+        ${renderSide(left, 'verso-compare-left')}
+        ${renderSide(right, 'verso-compare-right')}
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-compare has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(grid, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-compare" data-h="${h}" data-v="${v}">
+      <div class="layout-compare" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-cols verso-compare-cols">
-          ${renderSide(left, 'verso-compare-left')}
-          ${renderSide(right, 'verso-compare-right')}
-        </div>
+        ${grid}
       </div>
     `
   },
@@ -345,25 +466,36 @@ export const compare = defineLayout({
 export const stats = defineLayout({
   name: 'stats',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
     const hasContainers = ctx.blocks.some((b) => b.type === 'card' || b.type === 'panel')
     const cells: BlockGroup[] = hasContainers
       ? ctx.blocks.map((b, i) => ({ body: [{ block: b, idx: i }] }))
       : groupByHeading(ctx.blocks)
+    const grid = html`
+      <div class="verso-stats" data-count="${cells.length}">
+        ${cells.map(
+          (g) => html`
+            <div class="verso-stat">
+              ${g.heading ? html`<div class="verso-stat-number">${g.heading.text}</div>` : ''}
+              <div class="verso-stat-label">${renderIndexed(g.body, ctx)}</div>
+            </div>
+          `,
+        )}
+      </div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-stats has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(grid, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-stats" data-h="${h}" data-v="${v}">
+      <div class="layout-stats" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <div class="verso-stats" data-count="${cells.length}">
-          ${cells.map(
-            (g) => html`
-              <div class="verso-stat">
-                ${g.heading ? html`<div class="verso-stat-number">${g.heading.text}</div>` : ''}
-                <div class="verso-stat-label">${renderIndexed(g.body, ctx)}</div>
-              </div>
-            `,
-          )}
-        </div>
+        ${grid}
       </div>
     `
   },
@@ -372,18 +504,29 @@ export const stats = defineLayout({
 export const bigNumber = defineLayout({
   name: 'big-number',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
     const headingIdx = ctx.blocks.findIndex((b): b is HeadingBlock => b.type === 'heading')
     const heading = headingIdx >= 0 ? (ctx.blocks[headingIdx] as HeadingBlock) : undefined
     const rest = ctx.blocks
       .map((block, idx) => ({ block, idx }))
       .filter((entry) => entry.idx !== headingIdx)
+    const body = html`
+      ${heading ? html`<div class="verso-big-number">${heading.text}</div>` : ''}
+      <div class="verso-big-number-body">${renderIndexed(rest, ctx)}</div>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-big-number has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(body, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-big-number" data-h="${h}" data-v="${v}">
+      <div class="layout-big-number" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        ${heading ? html`<div class="verso-big-number">${heading.text}</div>` : ''}
-        <div class="verso-big-number-body">${renderIndexed(rest, ctx)}</div>
+        ${body}
       </div>
     `
   },
@@ -421,23 +564,34 @@ export const quote = defineLayout({
 export const timeline = defineLayout({
   name: 'timeline',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
     const groups = groupByHeading(ctx.blocks)
+    const list = html`
+      <ol class="verso-timeline" data-count="${groups.length}">
+        ${groups.map(
+          (g) => html`
+            <li class="verso-timeline-step">
+              <div class="verso-timeline-dot"></div>
+              ${g.heading ? html`<div class="verso-timeline-label">${g.heading.text}</div>` : ''}
+              <div class="verso-timeline-body">${renderIndexed(g.body, ctx)}</div>
+            </li>
+          `,
+        )}
+      </ol>
+    `
+    if (z.perZone) {
+      return html`
+        <div class="layout-timeline has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+          ${contentZone(list, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
     return html`
-      <div class="layout-timeline" data-h="${h}" data-v="${v}">
+      <div class="layout-timeline" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
         ${headerBlock(slide)}
         ${titleBlock(slide)}
-        <ol class="verso-timeline" data-count="${groups.length}">
-          ${groups.map(
-            (g) => html`
-              <li class="verso-timeline-step">
-                <div class="verso-timeline-dot"></div>
-                ${g.heading ? html`<div class="verso-timeline-label">${g.heading.text}</div>` : ''}
-                <div class="verso-timeline-body">${renderIndexed(g.body, ctx)}</div>
-              </li>
-            `,
-          )}
-        </ol>
+        ${list}
       </div>
     `
   },
@@ -460,22 +614,50 @@ export const closing = defineLayout({
 export const author = defineLayout({
   name: 'author',
   render: (slide, ctx) => {
-    const { h, v } = resolveAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
     const { image, rest } = splitImageAndRest(ctx.blocks)
-    return html`
-      <div class="layout-author" data-h="${h}" data-v="${v}">
-        <div class="verso-cols verso-author-cols">
-          <div class="verso-author-portrait">
-            ${
-              image
-                ? html`<img class="verso-author-img" src="${image.src}" alt="${image.alt ?? ''}" />`
-                : html`<div class="verso-author-placeholder"></div>`
-            }
+    // Author is the one layout where title and content live in the same right
+    // column inside a 2-col grid. Per-zone wrappers apply inside that column
+    // when opted in; otherwise we keep the historical sibling order so the
+    // existing CSS rules around `.verso-author-info` keep working.
+    const portrait = html`
+      <div class="verso-author-portrait">
+        ${
+          image
+            ? html`<img class="verso-author-img" src="${image.src}" alt="${image.alt ?? ''}" />`
+            : html`<div class="verso-author-placeholder"></div>`
+        }
+      </div>
+    `
+    const role = slide.header ? html`<div class="verso-author-role">${slide.header}</div>` : ''
+    const name = slide.title ? html`<h1 class="verso-author-name">${slide.title}</h1>` : ''
+    const body = html`<div class="verso-side-content">${renderIndexed(rest, ctx)}</div>`
+    if (z.perZone) {
+      return html`
+        <div class="layout-author has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          <div class="verso-cols verso-author-cols">
+            ${portrait}
+            <div class="verso-author-info">
+              <div class="verso-title-zone" data-h-title="${z.title.horizontal}" data-v-title="${z.title.vertical}">
+                ${role}
+                ${name}
+              </div>
+              <div class="verso-content-zone" data-h-content="${z.content.horizontal}" data-v-content="${z.content.vertical}">
+                ${body}
+              </div>
+            </div>
           </div>
+        </div>
+      `
+    }
+    return html`
+      <div class="layout-author" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        <div class="verso-cols verso-author-cols">
+          ${portrait}
           <div class="verso-author-info">
-            ${slide.header ? html`<div class="verso-author-role">${slide.header}</div>` : ''}
-            ${slide.title ? html`<h1 class="verso-author-name">${slide.title}</h1>` : ''}
-            <div class="verso-side-content">${renderIndexed(rest, ctx)}</div>
+            ${role}
+            ${name}
+            ${body}
           </div>
         </div>
       </div>

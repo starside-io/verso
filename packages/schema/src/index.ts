@@ -6,7 +6,9 @@ export {
   VerticalAlign,
   Tone,
   Variant,
+  resolveZoneAlign,
 } from './style.js'
+export type { ZoneAlign, ResolvedZoneAlign, ZoneAlignDefaults } from './style.js'
 export {
   ContentBlock,
   HeadingBlock,

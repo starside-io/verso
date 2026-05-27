@@ -66,11 +66,12 @@ const normalizeAlign = (align: Align): Align | undefined => {
   const t = next.title
   const c = next.content
   if (t && c) {
-    const sameH = t.horizontal !== undefined && t.horizontal === c.horizontal
-    const sameV = t.vertical !== undefined && t.vertical === c.vertical
-    if (sameH && sameV) {
-      next.horizontal = t.horizontal
-      next.vertical = t.vertical
+    // Use strict equality including undefined === undefined so two zones
+    // that only set one axis still collapse into the flat shape (with that
+    // single axis populated and the other left undefined).
+    if (t.horizontal === c.horizontal && t.vertical === c.vertical) {
+      if (t.horizontal !== undefined) next.horizontal = t.horizontal
+      if (t.vertical !== undefined) next.vertical = t.vertical
       delete next.title
       delete next.content
     }
