@@ -143,6 +143,14 @@ export interface CardBlock extends BaseBlockShape {
   tone?: Tone
   variant?: Variant
   padding?: 'none' | 'sm' | 'md' | 'lg'
+  /** Optional header text rendered above content. Useful as a quick title
+   *  without wrapping it in a heading block. */
+  header?: string
+  /** Optional Phosphor icon rendered next to the header (or above content if
+   *  no header). Same lookup pipeline as the standalone IconBlock. */
+  icon?: string
+  iconWeight?: IconWeight
+  iconTone?: Tone
   content: ContentBlock[]
 }
 
@@ -197,6 +205,10 @@ export const CardBlock: z.ZodType<CardBlock> = z.lazy(() =>
     tone: Tone.optional(),
     variant: Variant.optional(),
     padding: z.enum(['none', 'sm', 'md', 'lg']).optional(),
+    header: z.string().optional(),
+    icon: z.string().optional(),
+    iconWeight: z.enum(ICON_WEIGHTS).optional(),
+    iconTone: Tone.optional(),
     content: z.array(ContentBlock),
   }),
 )

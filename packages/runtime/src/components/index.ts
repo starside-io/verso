@@ -99,6 +99,37 @@ export const Callout = defineComponent<CalloutBlock>({
   },
 })
 
+// Renders the optional card header strip (icon + header text). Returns empty
+// string when neither is set, so cards without a header stay visually
+// identical to before this prop existed. Icon uses the same resolveIcon /
+// requestIconLoad pipeline as the standalone IconBlock so the viewer's
+// hydrator swaps placeholders the same way.
+const renderCardHeader = (props: CardBlock): string => {
+  const hasIcon = Boolean(props.icon)
+  const hasHeader = Boolean(props.header && props.header.length > 0)
+  if (!hasIcon && !hasHeader) return ''
+  const iconTone = props.iconTone ?? props.tone ?? 'primary'
+  let iconHtml = ''
+  if (hasIcon) {
+    const weight = (props.iconWeight ?? 'regular') as IconWeightName
+    const size = 24
+    const svg = resolveIcon(props.icon as string, weight)
+    if (svg) {
+      iconHtml = `<span class="verso-icon verso-card-icon" data-tone="${iconTone}" data-icon="${props.icon}" data-weight="${weight}">${applyIconAttrs(svg, size)}</span>`
+    } else {
+      requestIconLoad(props.icon as string, weight)
+      iconHtml = `<span class="verso-icon verso-icon-pending verso-card-icon" data-icon="${props.icon}" data-weight="${weight}" data-size="${size}" data-tone="${iconTone}" aria-hidden="true" style="display:inline-block;width:${size}px;height:${size}px"></span>`
+    }
+  }
+  const headerHtml = hasHeader ? `<span class="verso-card-header-text">${escapeHtmlMini(props.header as string)}</span>` : ''
+  return `<div class="verso-card-header">${iconHtml}${headerHtml}</div>`
+}
+// Tiny escape helper - the html`` template tag escapes interpolated values,
+// but we're building this string manually because the structure depends on
+// optional fields. Mirror the escape behavior so user header text is safe.
+const escapeHtmlMini = (s: string): string =>
+  s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
 export const Card = defineComponent<CardBlock>({
   name: 'card',
   render: (props, ctx) => {
@@ -107,7 +138,8 @@ export const Card = defineComponent<CardBlock>({
     const padding = props.padding ?? 'md'
     const parent = ctx.currentPath ?? []
     const inner = props.content.map((b, i) => ctx.block(b, [...parent, i]))
-    return html`<div class="verso-card" data-tone="${tone}" data-variant="${variant}" data-padding="${padding}">${inner}</div>`
+    const header = renderCardHeader(props)
+    return html`<div class="verso-card" data-tone="${tone}" data-variant="${variant}" data-padding="${padding}">${raw(header)}${inner}</div>`
   },
 })
 

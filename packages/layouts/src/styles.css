@@ -893,6 +893,26 @@
   min-width: 0;
 }
 
+/* Optional card header strip: icon + title text on one row, sits above the
+   card's content[]. Either, both, or neither field can be present. */
+.verso-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.25rem;
+}
+.verso-card-header-text {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: inherit;
+  flex: 1;
+  min-width: 0;
+}
+.verso-card-icon {
+  flex-shrink: 0;
+}
+
 /* When cards sit side-by-side in a multi-column layout (two-col, three-col),
    stretch them to fill their column so siblings in the same row visually
    match height. Without this, shorter card content makes one card "shorter"
