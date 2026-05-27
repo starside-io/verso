@@ -12,23 +12,42 @@ const EMBED_ASPECTS = ['16:9', '4:3', '1:1', '21:9', 'auto'] as const
 const ICON_WEIGHTS_LIST = ['thin', 'light', 'regular', 'bold', 'fill', 'duotone'] as const
 type IconWeightOpt = (typeof ICON_WEIGHTS_LIST)[number]
 
-// Shared lazy Phosphor SVG cache for the inspector preview tile. Re-uses the
-// same Vite glob the IconPicker uses (Vite dedupes), so picking an icon in the
-// modal and seeing it in the form preview only downloads the chunk once.
-const inspectorSvgLoaders = import.meta.glob<string>(
-  '/node_modules/@phosphor-icons/core/assets/**/*.svg',
-  { query: '?raw', import: 'default' },
-)
-const inspectorSvgByKey = new Map<string, () => Promise<string>>()
-for (const [path, fn] of Object.entries(inspectorSvgLoaders)) {
-  const m = path.match(/@phosphor-icons\/core\/assets\/([^/]+)\/([^/]+)\.svg$/)
-  if (!m) continue
-  const w = m[1]!
-  let n = m[2]!
-  if (w !== 'regular' && n.endsWith(`-${w}`)) n = n.slice(0, -(w.length + 1))
-  inspectorSvgByKey.set(`${w}/${n}`, fn)
-}
+// Shared Phosphor SVG cache for the inspector preview tile and the per-bullet
+// icon button. Fetches each icon on demand via the URL constant injected by
+// vite.config.ts (`__PHOSPHOR_ASSETS_URL__`) which points at Vite's /@fs/
+// mount for the resolved phosphor assets dir. This works in both the
+// workspace dev tree and any published editor install regardless of how
+// npm/pnpm hoisted @phosphor-icons. The browser HTTP cache dedupes
+// concurrent fetches; this module-level Map dedupes across re-renders.
+declare const __PHOSPHOR_ASSETS_URL__: string
 const inspectorSvgCache = new Map<string, string>()
+const fetchInspectorIcon = async (name: string, weight: string): Promise<string | null> => {
+  const fname = weight === 'regular' ? `${name}.svg` : `${name}-${weight}.svg`
+  try {
+    const r = await fetch(`${__PHOSPHOR_ASSETS_URL__}/${weight}/${fname}`)
+    if (!r.ok) return null
+    return await r.text()
+  } catch {
+    return null
+  }
+}
+
+// Kick off an SVG fetch if not already cached. Returns immediately; the
+// component re-renders via `force` once the fetch resolves.
+const ensureInspectorIcon = (
+  name: string,
+  weight: string,
+  force: (updater: (n: number) => number) => void,
+): void => {
+  const key = `${weight}/${name}`
+  if (inspectorSvgCache.has(key)) return
+  // Mark as in-flight so concurrent calls don't fire duplicate fetches.
+  inspectorSvgCache.set(key, '')
+  void fetchInspectorIcon(name, weight).then((svg) => {
+    inspectorSvgCache.set(key, svg ?? '')
+    force((n) => n + 1)
+  })
+}
 
 const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) => {
   const key = `${weight}/${name}`
@@ -41,22 +60,18 @@ const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) 
       </span>
     )
   }
-  if (!cached) {
-    const fn = inspectorSvgByKey.get(key)
-    if (fn) {
-      fn()
-        .then((svg) => {
-          inspectorSvgCache.set(key, svg)
-          force((n) => n + 1)
-        })
-        .catch(() => {
-          inspectorSvgCache.set(key, '')
-          force((n) => n + 1)
-        })
-    }
+  if (cached === undefined) {
+    ensureInspectorIcon(name, weight, force)
     return (
       <span aria-hidden="true" style={{ opacity: 0.3 }}>
         …
+      </span>
+    )
+  }
+  if (cached === '') {
+    return (
+      <span aria-hidden="true" style={{ opacity: 0.3 }}>
+        ?
       </span>
     )
   }
@@ -90,22 +105,18 @@ const BulletItemIconPreview = ({
       </span>
     )
   }
-  if (!cached) {
-    const fn = inspectorSvgByKey.get(key)
-    if (fn) {
-      fn()
-        .then((svg) => {
-          inspectorSvgCache.set(key, svg)
-          force((n) => n + 1)
-        })
-        .catch(() => {
-          inspectorSvgCache.set(key, '')
-          force((n) => n + 1)
-        })
-    }
+  if (cached === undefined) {
+    ensureInspectorIcon(name, weight, force)
     return (
       <span aria-hidden="true" style={{ opacity: 0.3 }}>
         …
+      </span>
+    )
+  }
+  if (cached === '') {
+    return (
+      <span aria-hidden="true" class="form-bullet-icon-placeholder">
+        ?
       </span>
     )
   }

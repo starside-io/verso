@@ -19,21 +19,30 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 type Weight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 const WEIGHTS: Weight[] = ['regular', 'bold', 'fill', 'duotone', 'light', 'thin']
 
-// Lazy SVG chunk loaders, keyed by "weight/name".
-const svgLoaders = import.meta.glob<string>('/node_modules/@phosphor-icons/core/assets/**/*.svg', {
-  query: '?raw',
-  import: 'default',
-})
-const loaderByKey = new Map<string, () => Promise<string>>()
-for (const [path, fn] of Object.entries(svgLoaders)) {
-  const m = path.match(/@phosphor-icons\/core\/assets\/([^/]+)\/([^/]+)\.svg$/)
-  if (!m) continue
-  const weight = m[1]!
-  let name = m[2]!
-  if (weight !== 'regular' && name.endsWith(`-${weight}`)) {
-    name = name.slice(0, -(weight.length + 1))
+// Per-icon SVG fetcher. Earlier versions used `import.meta.glob` over
+// `/node_modules/@phosphor-icons/core/assets/**/*.svg`, but Vite's glob only
+// resolves literal paths rooted at the project root. In a published editor
+// install npm/pnpm hoists @phosphor-icons above the editor's own
+// node_modules, so the glob matched zero files and every cell fell back to
+// the placeholder rectangle.
+//
+// Instead we fetch each SVG on demand from a Vite-served URL pointed at the
+// resolved phosphor assets dir (set as `__PHOSPHOR_ASSETS_URL__` in
+// vite.config.ts via `define`). Vite's `/@fs/` mount serves any path it's
+// allowed to access, so the URL is stable regardless of where the package
+// ended up after install.
+declare const __PHOSPHOR_ASSETS_URL__: string
+const loadIconSvg = async (name: string, weight: string): Promise<string | null> => {
+  // Phosphor names the regular weight as `<name>.svg` and every other weight
+  // as `<name>-<weight>.svg`.
+  const fname = weight === 'regular' ? `${name}.svg` : `${name}-${weight}.svg`
+  try {
+    const r = await fetch(`${__PHOSPHOR_ASSETS_URL__}/${weight}/${fname}`)
+    if (!r.ok) return null
+    return await r.text()
+  } catch {
+    return null
   }
-  loaderByKey.set(`${weight}/${name}`, fn)
 }
 
 // In-picker SVG cache so re-opening, re-searching, or scrolling doesn't
@@ -128,17 +137,8 @@ export const IconPicker = ({ open, initialName, initialWeight, onPick, onClose }
     Promise.all(
       toLoad.map(async (entry) => {
         const key = `${weight}/${entry.name}`
-        const fn = loaderByKey.get(key)
-        if (!fn) {
-          svgCache.set(key, FALLBACK_PLACEHOLDER)
-          return
-        }
-        try {
-          const svg = await fn()
-          svgCache.set(key, svg)
-        } catch {
-          svgCache.set(key, FALLBACK_PLACEHOLDER)
-        }
+        const svg = await loadIconSvg(entry.name, weight)
+        svgCache.set(key, svg ?? FALLBACK_PLACEHOLDER)
       }),
     ).then(() => {
       if (!cancelled) force((n) => n + 1)
