@@ -16,12 +16,7 @@ import type {
 } from '@starside-io/verso-schema'
 import { defineComponent } from '../define.js'
 import { html, raw } from '../html.js'
-import {
-  applyIconAttrs,
-  type IconWeightName,
-  requestIconLoad,
-  resolveIcon,
-} from '../icons.js'
+import { type IconWeightName, applyIconAttrs, requestIconLoad, resolveIcon } from '../icons.js'
 
 export const Heading = defineComponent<HeadingBlock>({
   name: 'heading',
@@ -121,7 +116,9 @@ const renderCardHeader = (props: CardBlock): string => {
       iconHtml = `<span class="verso-icon verso-icon-pending verso-card-icon" data-icon="${props.icon}" data-weight="${weight}" data-size="${size}" data-tone="${iconTone}" aria-hidden="true" style="display:inline-block;width:${size}px;height:${size}px"></span>`
     }
   }
-  const headerHtml = hasHeader ? `<span class="verso-card-header-text">${escapeHtmlMini(props.header as string)}</span>` : ''
+  const headerHtml = hasHeader
+    ? `<span class="verso-card-header-text">${escapeHtmlMini(props.header as string)}</span>`
+    : ''
   return `<div class="verso-card-header">${iconHtml}${headerHtml}</div>`
 }
 // Tiny escape helper - the html`` template tag escapes interpolated values,
@@ -235,7 +232,9 @@ export const Icon = defineComponent<IconBlock>({
     // Not cached. Fire-and-forget async load; the hydrator swaps in the SVG
     // when it arrives. The placeholder keeps the layout from jumping.
     requestIconLoad(props.name, weight)
-    const labelAttr = props.label ? `aria-label="${props.label.replace(/"/g, '&quot;')}" role="img"` : 'aria-hidden="true"'
+    const labelAttr = props.label
+      ? `aria-label="${props.label.replace(/"/g, '&quot;')}" role="img"`
+      : 'aria-hidden="true"'
     return html`<span
       class="verso-icon verso-icon-pending"
       data-icon="${props.name}"

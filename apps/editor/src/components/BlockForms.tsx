@@ -1,13 +1,7 @@
 import type { ContentBlock } from '@starside-io/verso-schema'
 import { useRef, useState } from 'preact/hooks'
 import { uploadAsset } from '../api'
-import {
-  flashOk,
-  iconPickerCallback,
-  iconPickerOpen,
-  iconPickerSeed,
-  status,
-} from '../state'
+import { flashOk, iconPickerCallback, iconPickerOpen, iconPickerSeed, status } from '../state'
 
 type Patch<T> = (next: T) => void
 
@@ -41,7 +35,11 @@ const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) 
   const cached = inspectorSvgCache.get(key)
   const [, force] = useState(0)
   if (!name) {
-    return <span aria-hidden="true" style={{ opacity: 0.4 }}>?</span>
+    return (
+      <span aria-hidden="true" style={{ opacity: 0.4 }}>
+        ?
+      </span>
+    )
   }
   if (!cached) {
     const fn = inspectorSvgByKey.get(key)
@@ -56,7 +54,11 @@ const IconPreview = ({ name, weight }: { name: string; weight: IconWeightOpt }) 
           force((n) => n + 1)
         })
     }
-    return <span aria-hidden="true" style={{ opacity: 0.3 }}>…</span>
+    return (
+      <span aria-hidden="true" style={{ opacity: 0.3 }}>
+        …
+      </span>
+    )
   }
   return (
     <span
@@ -101,7 +103,11 @@ const BulletItemIconPreview = ({
           force((n) => n + 1)
         })
     }
-    return <span aria-hidden="true" style={{ opacity: 0.3 }}>…</span>
+    return (
+      <span aria-hidden="true" style={{ opacity: 0.3 }}>
+        …
+      </span>
+    )
   }
   return (
     <span
@@ -295,11 +301,12 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
       // The form edits the text only; per-item icons live in the JSON panel
       // until we ship a dedicated per-item icon picker. We preserve any icon
       // metadata when the user edits the text so it isn't lost.
-      type BulletItem = string | { text: string; icon?: string; iconWeight?: string; iconTone?: string }
-      const items = (((block as any).items as BulletItem[]) ?? [])
-      const textOf = (it: BulletItem): string => (typeof it === 'string' ? it : it.text ?? '')
-      const iconOf = (it: BulletItem): string =>
-        typeof it === 'string' ? '' : (it.icon ?? '')
+      type BulletItem =
+        | string
+        | { text: string; icon?: string; iconWeight?: string; iconTone?: string }
+      const items = ((block as any).items as BulletItem[]) ?? []
+      const textOf = (it: BulletItem): string => (typeof it === 'string' ? it : (it.text ?? ''))
+      const iconOf = (it: BulletItem): string => (typeof it === 'string' ? '' : (it.icon ?? ''))
       const weightOf = (it: BulletItem): string =>
         typeof it === 'string' ? 'regular' : (it.iconWeight ?? 'regular')
       const update = (next: BulletItem[]) => onChange({ ...block, items: next } as ContentBlock)
@@ -359,7 +366,9 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
                 <button
                   type="button"
                   class={`form-bullet-icon-btn${itemIcon ? ' is-set' : ''}`}
-                  title={itemIcon ? `Icon: ${itemIcon} (${itemWeight}). Click to change.` : 'Add an icon'}
+                  title={
+                    itemIcon ? `Icon: ${itemIcon} (${itemWeight}). Click to change.` : 'Add an icon'
+                  }
                   onClick={() => openItemIconPicker(i)}
                   aria-label={itemIcon ? `Change icon (currently ${itemIcon})` : 'Add an icon'}
                 >
@@ -564,9 +573,7 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
           <TextRow
             label="Label (optional)"
             value={(block as any).label ?? ''}
-            onInput={(v) =>
-              onChange({ ...block, label: v.trim() || undefined } as ContentBlock)
-            }
+            onInput={(v) => onChange({ ...block, label: v.trim() || undefined } as ContentBlock)}
           />
         </>
       )
@@ -632,8 +639,7 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
     case 'card':
     case 'panel': {
       const cardIconName = ((block as any).icon as string | undefined) ?? ''
-      const cardIconWeight =
-        ((block as any).iconWeight as string | undefined) ?? 'regular'
+      const cardIconWeight = ((block as any).iconWeight as string | undefined) ?? 'regular'
       const openCardIconPicker = () => {
         iconPickerSeed.value = { name: cardIconName, weight: cardIconWeight }
         iconPickerCallback.value = ({ name, weight }) => {
@@ -642,11 +648,8 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
         iconPickerOpen.value = true
       }
       const clearCardIcon = () => {
-        const next = { ...block } as any
-        delete next.icon
-        delete next.iconWeight
-        delete next.iconTone
-        onChange(next as ContentBlock)
+        const { icon: _i, iconWeight: _w, iconTone: _t, ...rest } = block as any
+        onChange(rest as ContentBlock)
       }
       return (
         <>
@@ -685,10 +688,12 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
                 value={(block as any).header ?? ''}
                 onInput={(v) => {
                   const trimmed = v.trim()
-                  const next = { ...block } as any
-                  if (trimmed) next.header = v
-                  else delete next.header
-                  onChange(next as ContentBlock)
+                  if (trimmed) {
+                    onChange({ ...block, header: v } as ContentBlock)
+                  } else {
+                    const { header: _h, ...rest } = block as any
+                    onChange(rest as ContentBlock)
+                  }
                 }}
               />
               <div class="form-row icon-block-picker-row">
@@ -700,15 +705,10 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
                   aria-label="Browse icons for card"
                 >
                   <span class="icon-block-picker-preview">
-                    <IconPreview
-                      name={cardIconName}
-                      weight={cardIconWeight as IconWeightOpt}
-                    />
+                    <IconPreview name={cardIconName} weight={cardIconWeight as IconWeightOpt} />
                   </span>
                   <span class="icon-block-picker-meta">
-                    <span class="icon-block-picker-name">
-                      {cardIconName || 'Pick an icon…'}
-                    </span>
+                    <span class="icon-block-picker-name">{cardIconName || 'Pick an icon…'}</span>
                     <span class="icon-block-picker-weight">{cardIconWeight}</span>
                   </span>
                   <span class="icon-block-picker-action">Browse</span>
@@ -718,17 +718,11 @@ export const BlockForm = ({ block, onChange }: FormProps) => {
                 <>
                   <SelectRow
                     label="Icon tone"
-                    value={(block as any).iconTone ?? ((block as any).tone ?? 'primary')}
+                    value={(block as any).iconTone ?? (block as any).tone ?? 'primary'}
                     options={TONES}
-                    onInput={(v) =>
-                      onChange({ ...block, iconTone: v } as ContentBlock)
-                    }
+                    onInput={(v) => onChange({ ...block, iconTone: v } as ContentBlock)}
                   />
-                  <button
-                    type="button"
-                    class="form-clear-btn"
-                    onClick={clearCardIcon}
-                  >
+                  <button type="button" class="form-clear-btn" onClick={clearCardIcon}>
                     Remove icon
                   </button>
                 </>

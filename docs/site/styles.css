@@ -149,7 +149,7 @@ footer {
 }
 .nav-links a.is-active {
   color: var(--fg-strong);
-  background: rgba(255, 45, 135, 0.10);
+  background: rgba(255, 45, 135, 0.1);
   box-shadow: inset 0 -2px 0 var(--accent);
 }
 .nav-links a.is-active:hover {
@@ -173,7 +173,9 @@ footer {
     scrollbar-width: none;
     padding-bottom: 0.15rem;
   }
-  .nav-links::-webkit-scrollbar { display: none; }
+  .nav-links::-webkit-scrollbar {
+    display: none;
+  }
   .nav-links a {
     padding: 0.4rem 0.65rem;
     font-size: 0.86rem;
@@ -960,7 +962,7 @@ section {
   border-color: var(--pill, var(--accent));
 }
 .try-paths-filter.is-active {
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--fg-strong);
   border-color: var(--pill, var(--accent));
   box-shadow: 0 0 0 1px var(--pill, var(--accent)) inset;
@@ -991,8 +993,12 @@ section {
   z-index: 1;
 }
 @media (max-width: 760px) {
-  .try-paths-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .try-paths-svg { display: none; }
+  .try-paths-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .try-paths-svg {
+    display: none;
+  }
 }
 .try-paths-card {
   background: linear-gradient(180deg, #22222f, #1a1a25);
@@ -1002,7 +1008,8 @@ section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  transition: opacity 200ms ease, transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+  transition: opacity 200ms ease, transform 200ms ease, border-color 200ms ease, box-shadow 200ms
+    ease;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
 }
 .try-paths-card.is-dimmed {
@@ -1068,7 +1075,9 @@ section {
   transform: scale(1.15);
   box-shadow: 0 0 6px var(--chip-color, var(--accent));
 }
-.try-paths-chip:hover { color: var(--fg-strong); }
+.try-paths-chip:hover {
+  color: var(--fg-strong);
+}
 
 .try-paths-foot {
   display: flex;
@@ -1157,17 +1166,23 @@ section {
   line-height: 1.6;
 }
 @media (max-width: 700px) {
-  .simple-grid.is-2x2 { grid-template-columns: 1fr; }
+  .simple-grid.is-2x2 {
+    grid-template-columns: 1fr;
+  }
 }
 /* 3-per-row modifier for the .features grid (6 items in a clean 3x2). */
 .features.is-3-cols {
   grid-template-columns: repeat(3, 1fr);
 }
 @media (max-width: 880px) {
-  .features.is-3-cols { grid-template-columns: 1fr 1fr; }
+  .features.is-3-cols {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 @media (max-width: 540px) {
-  .features.is-3-cols { grid-template-columns: 1fr; }
+  .features.is-3-cols {
+    grid-template-columns: 1fr;
+  }
 }
 .simple-card {
   background: var(--pane);
@@ -1212,7 +1227,9 @@ section {
   gap: 1.5rem;
 }
 @media (max-width: 880px) {
-  .install-pair { grid-template-columns: 1fr; }
+  .install-pair {
+    grid-template-columns: 1fr;
+  }
 }
 .install-card {
   background: var(--pane);
@@ -1244,7 +1261,11 @@ section {
   letter-spacing: -0.01em;
   color: var(--fg-strong);
 }
-.install-card p { margin: 0; color: var(--muted-strong); font-size: 0.95rem; }
+.install-card p {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 0.95rem;
+}
 .install-card pre {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -1277,8 +1298,12 @@ section {
   align-items: flex-start;
 }
 @media (max-width: 880px) {
-  .docs-layout { grid-template-columns: 1fr; }
-  .docs-toc { position: static !important; }
+  .docs-layout {
+    grid-template-columns: 1fr;
+  }
+  .docs-toc {
+    position: static !important;
+  }
 }
 .docs-toc {
   position: sticky;
@@ -1339,12 +1364,14 @@ section {
   margin: 1.5rem 0 0.4rem;
   color: var(--fg-strong);
 }
-.docs-section p, .docs-section li {
+.docs-section p,
+.docs-section li {
   color: var(--muted-strong);
   font-size: 0.95rem;
   line-height: 1.65;
 }
-.docs-section ul, .docs-section ol {
+.docs-section ul,
+.docs-section ol {
   padding-left: 1.2rem;
 }
 .docs-section code {
@@ -1369,7 +1396,8 @@ section {
   margin-top: 0.75rem;
   font-size: 0.9rem;
 }
-.docs-section th, .docs-section td {
+.docs-section th,
+.docs-section td {
   text-align: left;
   padding: 0.55rem 0.75rem;
   border-bottom: 1px solid var(--border);

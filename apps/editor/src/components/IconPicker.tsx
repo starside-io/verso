@@ -20,10 +20,10 @@ type Weight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone'
 const WEIGHTS: Weight[] = ['regular', 'bold', 'fill', 'duotone', 'light', 'thin']
 
 // Lazy SVG chunk loaders, keyed by "weight/name".
-const svgLoaders = import.meta.glob<string>(
-  '/node_modules/@phosphor-icons/core/assets/**/*.svg',
-  { query: '?raw', import: 'default' },
-)
+const svgLoaders = import.meta.glob<string>('/node_modules/@phosphor-icons/core/assets/**/*.svg', {
+  query: '?raw',
+  import: 'default',
+})
 const loaderByKey = new Map<string, () => Promise<string>>()
 for (const [path, fn] of Object.entries(svgLoaders)) {
   const m = path.match(/@phosphor-icons\/core\/assets\/([^/]+)\/([^/]+)\.svg$/)
@@ -88,6 +88,12 @@ export const IconPicker = ({ open, initialName, initialWeight, onPick, onClose }
   // Cap initial render. Scrolling reveals more (handled via IntersectionObserver
   // on the sentinel at the bottom). Starting at 240 = ~6 rows of 5 cols.
   const [visibleCount, setVisibleCount] = useState(240)
+  // Reset pagination when the search query or weight changes so the user
+  // doesn't end up scrolled into yesterday's results. The biome rule wants
+  // every referenced var in deps; query + weight are both read implicitly
+  // by the act of "user typed/clicked", but listing them keeps the linter
+  // happy and matches React-style hook discipline.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: deps drive the reset behavior intentionally
   useEffect(() => {
     setVisibleCount(240)
   }, [query, weight])

@@ -15,10 +15,10 @@ import { applyIconAttrs, setIconLoader } from '@starside-io/verso-runtime'
 // Vite glob: discovers every Phosphor SVG and gives us a record of
 // { path: () => Promise<string> } lazy loaders. `query: '?raw'` makes the
 // chunk a string; `import: 'default'` unwraps the default export.
-const svgLoaders = import.meta.glob<string>(
-  '/node_modules/@phosphor-icons/core/assets/**/*.svg',
-  { query: '?raw', import: 'default' },
-)
+const svgLoaders = import.meta.glob<string>('/node_modules/@phosphor-icons/core/assets/**/*.svg', {
+  query: '?raw',
+  import: 'default',
+})
 
 // Build a keyed lookup: "regular/check" -> loader fn. Phosphor's filenames
 // are `<name>.svg` for regular weight and `<name>-<weight>.svg` for every
@@ -39,7 +39,7 @@ for (const [path, loader] of Object.entries(svgLoaders)) {
 const swapPendingPlaceholders = (name: string, weight: string, svg: string): void => {
   const selector = `.verso-icon-pending[data-icon="${CSS.escape(name)}"][data-weight="${CSS.escape(weight)}"]`
   const targets = document.querySelectorAll<HTMLElement>(selector)
-  targets.forEach((el) => {
+  for (const el of targets) {
     const size = Number.parseInt(el.dataset.size ?? '32', 10)
     const label = el.getAttribute('aria-label') ?? undefined
     // Preserve all classes the renderer put on this span EXCEPT the "pending"
@@ -52,7 +52,7 @@ const swapPendingPlaceholders = (name: string, weight: string, svg: string): voi
     el.style.height = ''
     el.style.display = ''
     el.innerHTML = applyIconAttrs(svg, size, label)
-  })
+  }
 }
 
 let hydratorInstalled = false

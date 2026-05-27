@@ -46,14 +46,14 @@ type GlobalWithState = typeof globalThis & {
   [STATE_SYMBOL]?: IconRegistryState
 }
 const g = globalThis as GlobalWithState
-const state: IconRegistryState =
-  g[STATE_SYMBOL] ??
-  (g[STATE_SYMBOL] = {
-    cache: new Map<string, string>(),
-    inflight: new Map<string, Promise<string | null>>(),
-    resolver: () => null,
-    loader: null,
-  })
+const initState = (): IconRegistryState => ({
+  cache: new Map<string, string>(),
+  inflight: new Map<string, Promise<string | null>>(),
+  resolver: () => null,
+  loader: null,
+})
+if (!g[STATE_SYMBOL]) g[STATE_SYMBOL] = initState()
+const state: IconRegistryState = g[STATE_SYMBOL]
 
 export const setIconResolver = (fn: SyncResolver): void => {
   state.resolver = fn

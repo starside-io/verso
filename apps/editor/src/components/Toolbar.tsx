@@ -59,9 +59,18 @@ const layoutCategories = Array.from(new Set(BUILT_IN_LAYOUTS.map((l) => l.catego
 //     wrappers (so users who don't use per-zone alignment never see it)
 //   - return undefined when nothing meaningful is set
 const normalizeAlign = (align: Align): Align | undefined => {
-  const next: Align = { ...align }
-  if (next.title && Object.keys(next.title).length === 0) delete next.title
-  if (next.content && Object.keys(next.content).length === 0) delete next.content
+  // Drop empty per-zone wrappers ({} is noise on disk).
+  const titleEmpty = align.title && Object.keys(align.title).length === 0
+  const contentEmpty = align.content && Object.keys(align.content).length === 0
+  let next: Align = { ...align }
+  if (titleEmpty || contentEmpty) {
+    const { title: _t, content: _c, ...rest } = next
+    next = {
+      ...rest,
+      ...(titleEmpty ? {} : align.title ? { title: align.title } : {}),
+      ...(contentEmpty ? {} : align.content ? { content: align.content } : {}),
+    }
+  }
 
   const t = next.title
   const c = next.content
@@ -70,10 +79,10 @@ const normalizeAlign = (align: Align): Align | undefined => {
     // that only set one axis still collapse into the flat shape (with that
     // single axis populated and the other left undefined).
     if (t.horizontal === c.horizontal && t.vertical === c.vertical) {
+      const { title: _t2, content: _c2, ...rest } = next
+      next = { ...rest }
       if (t.horizontal !== undefined) next.horizontal = t.horizontal
       if (t.vertical !== undefined) next.vertical = t.vertical
-      delete next.title
-      delete next.content
     }
   }
 

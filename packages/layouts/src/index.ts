@@ -40,7 +40,12 @@ const titleBlock = (slide: Slide, className = 'verso-title') =>
 // (align.title or align.content set). Empty wrappers degrade gracefully if
 // the slide has neither header nor title (we still emit the zone so the
 // content-zone keeps a known sibling for the per-zone CSS rules).
-const titleZone = (slide: Slide, h: HorizontalAlign, v: VerticalAlign, titleClass = 'verso-title') =>
+const titleZone = (
+  slide: Slide,
+  h: HorizontalAlign,
+  v: VerticalAlign,
+  titleClass = 'verso-title',
+) =>
   html`
     <div class="verso-title-zone" data-h-title="${h}" data-v-title="${v}">
       ${headerBlock(slide)}
@@ -48,11 +53,7 @@ const titleZone = (slide: Slide, h: HorizontalAlign, v: VerticalAlign, titleClas
     </div>
   `
 
-const contentZone = (
-  inner: unknown,
-  h: HorizontalAlign,
-  v: VerticalAlign,
-) =>
+const contentZone = (inner: unknown, h: HorizontalAlign, v: VerticalAlign) =>
   html`
     <div class="verso-content-zone" data-h-content="${h}" data-v-content="${v}">
       ${inner}

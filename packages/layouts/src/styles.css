@@ -872,11 +872,21 @@
   line-height: 0;
   color: var(--color-primary);
 }
-.verso-icon[data-tone="primary"]   { color: var(--color-primary); }
-.verso-icon[data-tone="secondary"] { color: var(--color-secondary); }
-.verso-icon[data-tone="accent"]    { color: var(--color-accent); }
-.verso-icon[data-tone="muted"]     { color: var(--color-muted); }
-.verso-icon[data-tone="surface"]   { color: var(--color-surface); }
+.verso-icon[data-tone="primary"] {
+  color: var(--color-primary);
+}
+.verso-icon[data-tone="secondary"] {
+  color: var(--color-secondary);
+}
+.verso-icon[data-tone="accent"] {
+  color: var(--color-accent);
+}
+.verso-icon[data-tone="muted"] {
+  color: var(--color-muted);
+}
+.verso-icon[data-tone="surface"] {
+  color: var(--color-surface);
+}
 .verso-icon-pending {
   background: color-mix(in srgb, currentColor 10%, transparent);
   border-radius: 4px;

@@ -182,7 +182,16 @@ export const App = () => {
       <IconPicker
         open={iconOpen}
         initialName={iconPickerSeed.value?.name}
-        initialWeight={iconPickerSeed.value?.weight as 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone' | undefined}
+        initialWeight={
+          iconPickerSeed.value?.weight as
+            | 'thin'
+            | 'light'
+            | 'regular'
+            | 'bold'
+            | 'fill'
+            | 'duotone'
+            | undefined
+        }
         onPick={(next) => iconPickerCallback.value?.(next)}
         onClose={() => {
           iconPickerOpen.value = false
