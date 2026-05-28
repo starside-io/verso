@@ -1229,7 +1229,14 @@
   background: rgba(0, 0, 0, 0.04);
   padding: 1rem;
   border-radius: 6px;
+  /* pre-wrap + overflow-wrap so long lines wrap inside the code block
+     instead of pushing the parent card past the slide edge. overflow-x is
+     kept as a fallback for truly unbreakable strings (rare). min-width: 0
+     lets flex / grid parents shrink the code element to their column. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   overflow-x: auto;
+  min-width: 0;
   font-size: 0.95rem;
   border-left: 3px solid var(--color-secondary);
 }
