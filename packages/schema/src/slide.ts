@@ -36,6 +36,38 @@ export const layoutRequirements: Record<
   'image-right': { minBlocks: 1, needsImage: true },
   stats: { minBlocks: 1 },
   'big-number': { minBlocks: 1 },
+  // Asymmetric splits. Same shape as two-col: 2 columns, blocks split by
+  // midpoint, must be a multiple of 2 to balance.
+  'one-third-left': { minBlocks: 2, mustBeMultipleOf: 2 },
+  'one-third-right': { minBlocks: 2, mustBeMultipleOf: 2 },
+  'two-thirds-left': { minBlocks: 2, mustBeMultipleOf: 2 },
+  'two-thirds-right': { minBlocks: 2, mustBeMultipleOf: 2 },
+  // Grids. quad and swot are fixed 2x2 (exactly 4). icon-grid is flexible
+  // but should have at least 3 cells to read as a grid. kpi-band needs at
+  // least one card up top.
+  quad: { minBlocks: 4 },
+  swot: { minBlocks: 4 },
+  'icon-grid': { minBlocks: 3 },
+  'kpi-band': { minBlocks: 1 },
+  // Image-driven. picture-fill needs an image to fill the slide;
+  // picture-with-caption needs both an image and at least one block for the
+  // caption side. bento needs at least 3 cells to look like a magazine grid.
+  'picture-fill': { minBlocks: 1, needsImage: true },
+  'picture-with-caption': { minBlocks: 2, needsImage: true },
+  bento: { minBlocks: 3 },
+  // Title + special. title-only and chapter only render the slide title;
+  // callout-banner uses the title + first block. q-and-a needs at least 2
+  // blocks for the Q and the A.
+  'title-band': { minBlocks: 0 },
+  'title-only': { minBlocks: 0 },
+  'callout-banner': { minBlocks: 1 },
+  chapter: { minBlocks: 0 },
+  'q-and-a': { minBlocks: 2 },
+  // Flow + structured. process needs at least 2 steps to be a process.
+  // split-vertical is 2 stacked panels. roadmap needs at least 2 quarters.
+  process: { minBlocks: 2 },
+  'split-vertical': { minBlocks: 2, mustBeMultipleOf: 2 },
+  roadmap: { minBlocks: 2 },
 }
 
 const BaseSlide = z.object({

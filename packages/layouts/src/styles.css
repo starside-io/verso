@@ -1793,3 +1793,570 @@
     animation: none;
   }
 }
+
+/* ========================================================================
+   New layouts (asymmetric splits, grids, image-driven, special, flow)
+   ======================================================================== */
+
+/* Shared root styling: every new layout follows the column / flex pattern. */
+.layout-one-third-left,
+.layout-one-third-right,
+.layout-two-thirds-left,
+.layout-two-thirds-right,
+.layout-quad,
+.layout-icon-grid,
+.layout-kpi-band,
+.layout-swot,
+.layout-picture-fill,
+.layout-picture-with-caption,
+.layout-bento,
+.layout-title-band,
+.layout-title-only,
+.layout-callout-banner,
+.layout-chapter,
+.layout-q-and-a,
+.layout-process,
+.layout-split-vertical,
+.layout-roadmap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Vertical alignment (root, back-compat path). */
+.layout-one-third-left[data-v="top"],
+.layout-one-third-right[data-v="top"],
+.layout-two-thirds-left[data-v="top"],
+.layout-two-thirds-right[data-v="top"],
+.layout-quad[data-v="top"],
+.layout-icon-grid[data-v="top"],
+.layout-kpi-band[data-v="top"],
+.layout-swot[data-v="top"],
+.layout-picture-fill[data-v="top"],
+.layout-picture-with-caption[data-v="top"],
+.layout-bento[data-v="top"],
+.layout-title-band[data-v="top"],
+.layout-title-only[data-v="top"],
+.layout-callout-banner[data-v="top"],
+.layout-chapter[data-v="top"],
+.layout-q-and-a[data-v="top"],
+.layout-process[data-v="top"],
+.layout-split-vertical[data-v="top"],
+.layout-roadmap[data-v="top"] {
+  justify-content: flex-start;
+}
+.layout-one-third-left[data-v="middle"],
+.layout-one-third-right[data-v="middle"],
+.layout-two-thirds-left[data-v="middle"],
+.layout-two-thirds-right[data-v="middle"],
+.layout-quad[data-v="middle"],
+.layout-icon-grid[data-v="middle"],
+.layout-kpi-band[data-v="middle"],
+.layout-swot[data-v="middle"],
+.layout-picture-fill[data-v="middle"],
+.layout-picture-with-caption[data-v="middle"],
+.layout-bento[data-v="middle"],
+.layout-title-band[data-v="middle"],
+.layout-title-only[data-v="middle"],
+.layout-callout-banner[data-v="middle"],
+.layout-chapter[data-v="middle"],
+.layout-q-and-a[data-v="middle"],
+.layout-process[data-v="middle"],
+.layout-split-vertical[data-v="middle"],
+.layout-roadmap[data-v="middle"] {
+  justify-content: center;
+}
+.layout-one-third-left[data-v="bottom"],
+.layout-one-third-right[data-v="bottom"],
+.layout-two-thirds-left[data-v="bottom"],
+.layout-two-thirds-right[data-v="bottom"],
+.layout-quad[data-v="bottom"],
+.layout-icon-grid[data-v="bottom"],
+.layout-kpi-band[data-v="bottom"],
+.layout-swot[data-v="bottom"],
+.layout-picture-fill[data-v="bottom"],
+.layout-picture-with-caption[data-v="bottom"],
+.layout-bento[data-v="bottom"],
+.layout-title-band[data-v="bottom"],
+.layout-title-only[data-v="bottom"],
+.layout-callout-banner[data-v="bottom"],
+.layout-chapter[data-v="bottom"],
+.layout-q-and-a[data-v="bottom"],
+.layout-process[data-v="bottom"],
+.layout-split-vertical[data-v="bottom"],
+.layout-roadmap[data-v="bottom"] {
+  justify-content: flex-end;
+}
+
+/* --- Asymmetric splits ----------------------------------------------------
+   Each is two columns with one fraction asymmetric. The shared `.verso-cols`
+   helper is used so existing column styling (image-side, side-content) reuses. */
+
+.layout-one-third-left .verso-cols {
+  grid-template-columns: 1fr 2fr;
+}
+.layout-one-third-right .verso-cols {
+  grid-template-columns: 2fr 1fr;
+}
+.layout-two-thirds-left .verso-cols {
+  grid-template-columns: 2fr 1fr;
+}
+.layout-two-thirds-right .verso-cols {
+  grid-template-columns: 1fr 2fr;
+}
+
+.layout-one-third-left .verso-cols,
+.layout-one-third-right .verso-cols,
+.layout-two-thirds-left .verso-cols,
+.layout-two-thirds-right .verso-cols {
+  display: grid;
+  grid-template-rows: 1fr;
+  gap: 2.5rem;
+  flex: 1;
+  align-items: stretch;
+  align-self: stretch;
+}
+.layout-one-third-left .verso-col,
+.layout-one-third-right .verso-col,
+.layout-two-thirds-left .verso-col,
+.layout-two-thirds-right .verso-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* --- Quad (2x2 grid) ------------------------------------------------------- */
+
+.layout-quad .verso-quad {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.5rem;
+  align-self: stretch;
+}
+.verso-quad-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: color-mix(in srgb, var(--color-primary) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
+}
+
+/* --- Icon grid ------------------------------------------------------------- */
+
+.layout-icon-grid .verso-icon-grid {
+  flex: 1;
+  display: grid;
+  gap: 1.25rem;
+  align-self: stretch;
+}
+.layout-icon-grid .verso-icon-grid[data-count="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+.layout-icon-grid .verso-icon-grid[data-count="4"] {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+.layout-icon-grid .verso-icon-grid[data-count="5"],
+.layout-icon-grid .verso-icon-grid[data-count="6"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+.layout-icon-grid .verso-icon-grid[data-count="7"],
+.layout-icon-grid .verso-icon-grid[data-count="8"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+.verso-icon-grid-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem;
+  min-width: 0;
+}
+
+/* --- KPI band -------------------------------------------------------------- */
+
+.layout-kpi-band .verso-kpi-band-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.layout-kpi-band .verso-kpi-band-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --- SWOT ------------------------------------------------------------------ */
+
+.layout-swot .verso-swot {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.25rem;
+  align-self: stretch;
+}
+.verso-swot-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+.verso-swot-cell[data-quadrant="strengths"] {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+}
+.verso-swot-cell[data-quadrant="weaknesses"] {
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+.verso-swot-cell[data-quadrant="opportunities"] {
+  background: color-mix(in srgb, var(--color-secondary) 8%, transparent);
+}
+.verso-swot-cell[data-quadrant="threats"] {
+  background: color-mix(in srgb, var(--color-muted) 14%, transparent);
+}
+.verso-swot-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.6rem;
+}
+
+/* --- Picture fill ---------------------------------------------------------- */
+
+.layout-picture-fill {
+  position: relative;
+  overflow: hidden;
+}
+.verso-picture-fill-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.verso-picture-fill-overlay {
+  position: relative;
+  z-index: 1;
+  margin-top: auto;
+  padding: 4rem 3rem 3rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+  color: #fff;
+}
+.verso-picture-fill-title {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  margin: 0.3rem 0;
+  line-height: 1.1;
+  color: inherit;
+}
+
+/* --- Picture with caption -------------------------------------------------- */
+
+.layout-picture-with-caption .verso-cols.verso-picture-caption-cols {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 2.5rem;
+  flex: 1;
+  align-items: stretch;
+}
+.verso-picture-caption-img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.verso-picture-caption-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.verso-picture-caption-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+/* --- Bento ----------------------------------------------------------------- */
+
+.layout-bento .verso-bento {
+  flex: 1;
+  display: grid;
+  gap: 1.25rem;
+  align-self: stretch;
+}
+.layout-bento .verso-bento[data-count="3"] {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.layout-bento .verso-bento[data-count="3"] .verso-bento-cell[data-cell="0"] {
+  grid-row: span 2;
+}
+.layout-bento .verso-bento[data-count="4"] {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.layout-bento .verso-bento[data-count="4"] .verso-bento-cell[data-cell="0"] {
+  grid-row: span 2;
+}
+.layout-bento .verso-bento[data-count="5"],
+.layout-bento .verso-bento[data-count="6"] {
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.layout-bento .verso-bento[data-count="5"] .verso-bento-cell[data-cell="0"],
+.layout-bento .verso-bento[data-count="6"] .verso-bento-cell[data-cell="0"] {
+  grid-row: span 2;
+}
+.verso-bento-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 1.25rem 1.5rem;
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, transparent);
+  border-radius: 12px;
+}
+
+/* --- Title band ------------------------------------------------------------ */
+
+.verso-title-band {
+  width: 100%;
+  padding: 1.75rem 2.5rem;
+  background: var(--color-primary);
+  color: var(--color-background, #fff);
+  border-radius: 8px;
+  margin-bottom: 1.75rem;
+}
+.verso-title-band-title {
+  margin: 0.25rem 0;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.1;
+  color: inherit;
+}
+
+/* --- Title only ------------------------------------------------------------ */
+
+.layout-title-only {
+  justify-content: center;
+  align-items: center;
+}
+.verso-title-only-title {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1.1;
+  text-align: center;
+  margin: 0;
+}
+
+/* --- Callout banner -------------------------------------------------------- */
+
+.verso-callout-banner {
+  padding: 2.5rem 3rem;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-left: 6px solid var(--color-accent);
+  margin-bottom: 1.5rem;
+}
+.verso-callout-banner-title {
+  margin: 0.4rem 0;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.15;
+}
+.verso-callout-banner-body {
+  font-size: 1.15rem;
+  line-height: 1.55;
+}
+.verso-callout-banner-after {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* --- Chapter --------------------------------------------------------------- */
+
+.layout-chapter {
+  padding: 0 4rem;
+}
+.verso-chapter-kicker {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+.verso-chapter-title {
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1.05;
+  margin: 0 0 1.5rem;
+  color: var(--color-primary);
+}
+.verso-chapter-body {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-width: 60ch;
+  color: var(--color-foreground, #333);
+}
+
+/* --- Q&A ------------------------------------------------------------------- */
+
+.verso-qa {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.verso-qa-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+.verso-qa-marker {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.verso-qa-q .verso-qa-marker {
+  background: var(--color-primary);
+  color: var(--color-background, #fff);
+}
+.verso-qa-a .verso-qa-marker {
+  background: var(--color-accent);
+  color: var(--color-background, #fff);
+}
+.verso-qa-body {
+  flex: 1;
+  font-size: 1.1rem;
+  line-height: 1.55;
+  padding-top: 0.4rem;
+}
+.verso-qa-after {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* --- Process flow (horizontal chevrons) ----------------------------------- */
+
+.verso-process {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  flex: 1;
+  align-items: stretch;
+}
+.verso-process-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.25rem 1.25rem 1.25rem 2.25rem;
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+  position: relative;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 1.5rem) 0,
+    100% 50%,
+    calc(100% - 1.5rem) 100%,
+    0 100%,
+    1.5rem 50%
+  );
+  min-width: 0;
+}
+.verso-process-step:first-child {
+  clip-path: polygon(0 0, calc(100% - 1.5rem) 0, 100% 50%, calc(100% - 1.5rem) 100%, 0 100%);
+  padding-left: 1.25rem;
+}
+.verso-process-step:last-child {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 1.5rem 50%);
+}
+.verso-process-step-num {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+.verso-process-step-body {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- Split vertical (top half + bottom half) ------------------------------ */
+
+.layout-split-vertical .verso-rows {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  flex: 1;
+  align-self: stretch;
+}
+.layout-split-vertical .verso-row {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.layout-split-vertical .verso-row-top {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 18%, transparent);
+  padding-bottom: 1.25rem;
+}
+
+/* --- Roadmap (quarterly columns) ------------------------------------------ */
+
+.layout-roadmap .verso-roadmap {
+  flex: 1;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 1.25rem;
+  align-self: stretch;
+}
+.verso-roadmap-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  border-top: 4px solid var(--color-primary);
+}
+.verso-roadmap-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin-bottom: 0.75rem;
+}
+.verso-roadmap-body {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}

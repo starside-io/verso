@@ -1,4 +1,9 @@
-import { type LayoutContext, defineLayout, html } from '@starside-io/verso-runtime'
+import {
+  type LayoutContext,
+  type RenderResult,
+  defineLayout,
+  html,
+} from '@starside-io/verso-runtime'
 import {
   type Align,
   type BulletsBlock,
@@ -666,6 +671,395 @@ export const author = defineLayout({
   },
 })
 
+// =========================================================================
+// Additional layouts (asymmetric splits, grids, image-driven, special, flow)
+// =========================================================================
+
+// Helper: wrap a layout body with optional per-zone title/content wrappers.
+// Layouts with both a title strip and a content area follow the same pattern;
+// this collapses the boilerplate.
+const withZones = (
+  layoutClass: string,
+  slide: Slide,
+  z: ReturnType<typeof resolveZoneAlign>,
+  body: unknown,
+): RenderResult => {
+  if (z.perZone) {
+    return html`
+      <div class="${layoutClass} has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        ${titleZone(slide, z.title.horizontal, z.title.vertical)}
+        ${contentZone(body, z.content.horizontal, z.content.vertical)}
+      </div>
+    `
+  }
+  return html`
+    <div class="${layoutClass}" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+      ${headerBlock(slide)}
+      ${titleBlock(slide)}
+      ${body}
+    </div>
+  `
+}
+
+// --- Asymmetric splits -----------------------------------------------------
+
+// Build a generic asymmetric split. firstFraction is "1fr" / "2fr" template;
+// blocks are sliced in half by midpoint then dropped into the two columns.
+const renderAsymmetric = (slide: Slide, ctx: LayoutContext, layoutClass: string): RenderResult => {
+  const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+  const half = Math.ceil(ctx.blocks.length / 2)
+  const left = sliceIndexed(ctx.blocks, 0, half)
+  const right = sliceIndexed(ctx.blocks, half, ctx.blocks.length)
+  const cols = html`
+    <div class="verso-cols">
+      <div class="verso-col"><div class="verso-side-content">${renderIndexed(left, ctx)}</div></div>
+      <div class="verso-col"><div class="verso-side-content">${renderIndexed(right, ctx)}</div></div>
+    </div>
+  `
+  return withZones(layoutClass, slide, z, cols)
+}
+
+export const oneThirdLeft = defineLayout({
+  name: 'one-third-left',
+  render: (slide, ctx) => renderAsymmetric(slide, ctx, 'layout-one-third-left'),
+})
+
+export const oneThirdRight = defineLayout({
+  name: 'one-third-right',
+  render: (slide, ctx) => renderAsymmetric(slide, ctx, 'layout-one-third-right'),
+})
+
+export const twoThirdsLeft = defineLayout({
+  name: 'two-thirds-left',
+  render: (slide, ctx) => renderAsymmetric(slide, ctx, 'layout-two-thirds-left'),
+})
+
+export const twoThirdsRight = defineLayout({
+  name: 'two-thirds-right',
+  render: (slide, ctx) => renderAsymmetric(slide, ctx, 'layout-two-thirds-right'),
+})
+
+// --- Grids -----------------------------------------------------------------
+
+export const quad = defineLayout({
+  name: 'quad',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // 2x2 grid. Blocks 0+1 are top row, 2+3 are bottom row.
+    const cells = ctx.blocks.slice(0, 4).map(
+      (b, i) => html`
+      <div class="verso-quad-cell"><div class="verso-side-content">${ctx.block(b, [i])}</div></div>
+    `,
+    )
+    return withZones('layout-quad', slide, z, html`<div class="verso-quad">${cells}</div>`)
+  },
+})
+
+export const iconGrid = defineLayout({
+  name: 'icon-grid',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // Renders any block. Cells size to content; CSS Grid auto-flow handles 2x2,
+    // 3x2, or 4x2 depending on count. Best with card or icon blocks.
+    const count = ctx.blocks.length
+    const cells = ctx.blocks.map(
+      (b, i) => html`
+      <div class="verso-icon-grid-cell"><div class="verso-side-content">${ctx.block(b, [i])}</div></div>
+    `,
+    )
+    return withZones(
+      'layout-icon-grid',
+      slide,
+      z,
+      html`<div class="verso-icon-grid" data-count="${String(count)}">${cells}</div>`,
+    )
+  },
+})
+
+export const kpiBand = defineLayout({
+  name: 'kpi-band',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // The first run of card blocks forms the KPI row at the top. Everything
+    // after the first non-card block is rendered as supporting content below.
+    const kpiEnd = ctx.blocks.findIndex((b) => b.type !== 'card')
+    const splitIdx = kpiEnd === -1 ? ctx.blocks.length : kpiEnd
+    const kpis = sliceIndexed(ctx.blocks, 0, splitIdx)
+    const body = sliceIndexed(ctx.blocks, splitIdx, ctx.blocks.length)
+    const kpiRow = html`
+      <div class="verso-kpi-band-row" data-count="${String(kpis.length)}">${renderIndexed(kpis, ctx)}</div>
+    `
+    const bodyBlock =
+      body.length > 0
+        ? html`<div class="verso-kpi-band-body">${renderIndexed(body, ctx)}</div>`
+        : ''
+    return withZones('layout-kpi-band', slide, z, html`${kpiRow}${bodyBlock}`)
+  },
+})
+
+export const swot = defineLayout({
+  name: 'swot',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // 2x2 grid with fixed quadrant labels. Each of the first 4 blocks goes
+    // into one quadrant. Labels rendered at the top of each cell.
+    const LABELS = ['Strengths', 'Weaknesses', 'Opportunities', 'Threats']
+    const cells = ctx.blocks.slice(0, 4).map(
+      (b, i) => html`
+      <div class="verso-swot-cell" data-quadrant="${LABELS[i]?.toLowerCase() ?? ''}">
+        <div class="verso-swot-label">${LABELS[i] ?? ''}</div>
+        <div class="verso-side-content">${ctx.block(b, [i])}</div>
+      </div>
+    `,
+    )
+    return withZones('layout-swot', slide, z, html`<div class="verso-swot">${cells}</div>`)
+  },
+})
+
+// --- Image-driven ----------------------------------------------------------
+
+export const pictureFill = defineLayout({
+  name: 'picture-fill',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'bottom' })
+    const { image, rest } = splitImageAndRest(ctx.blocks)
+    // Image fills the slide as background. Title + minimal text overlay sit at
+    // the bottom (or wherever align.content.vertical puts them) with a gradient
+    // for readability.
+    return html`
+      <div class="layout-picture-fill" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        ${image ? html`<img class="verso-picture-fill-img" src="${image.src}" alt="${image.alt ?? ''}" />` : ''}
+        <div class="verso-picture-fill-overlay">
+          ${headerBlock(slide)}
+          ${titleBlock(slide, 'verso-picture-fill-title')}
+          <div class="verso-picture-fill-body">${renderIndexed(rest, ctx)}</div>
+        </div>
+      </div>
+    `
+  },
+})
+
+export const pictureWithCaption = defineLayout({
+  name: 'picture-with-caption',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    const { image, imageIdx, rest } = splitImageAndRest(ctx.blocks)
+    // Image on the left at 60% width, large caption (first heading + first
+    // text block) on the right at 40%. Different from image-left in that the
+    // caption side is type-heavy, not block-stack.
+    const cols = html`
+      <div class="verso-cols verso-picture-caption-cols">
+        <div class="verso-picture-caption-img">
+          ${image ? ctx.block(image, [imageIdx]) : ''}
+        </div>
+        <div class="verso-picture-caption-text">
+          <div class="verso-side-content">${renderIndexed(rest, ctx)}</div>
+        </div>
+      </div>
+    `
+    return withZones('layout-picture-with-caption', slide, z, cols)
+  },
+})
+
+export const bento = defineLayout({
+  name: 'bento',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // First block is the "hero" cell (takes 2 columns on top row); next two
+    // blocks are stacked on the right or sit on the bottom row depending on
+    // how many blocks total. With 3+ blocks, renders as a 2-row asymmetric grid.
+    const cells = ctx.blocks.map(
+      (b, i) => html`
+      <div class="verso-bento-cell" data-cell="${String(i)}">
+        <div class="verso-side-content">${ctx.block(b, [i])}</div>
+      </div>
+    `,
+    )
+    return withZones(
+      'layout-bento',
+      slide,
+      z,
+      html`<div class="verso-bento" data-count="${String(ctx.blocks.length)}">${cells}</div>`,
+    )
+  },
+})
+
+// --- Title + special -------------------------------------------------------
+
+export const titleBand = defineLayout({
+  name: 'title-band',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // Full-width colored title bar at the top, body below as one column. The
+    // title-band is styled differently from a normal title (filled background,
+    // larger type) so it reads as a section/topic heading on a content slide.
+    const titleStrip = html`
+      <div class="verso-title-band">
+        ${headerBlock(slide)}
+        ${slide.title ? html`<h1 class="verso-title-band-title">${slide.title}</h1>` : ''}
+      </div>
+    `
+    const body = html`<div class="verso-content">${renderBlocks(ctx.blocks, ctx)}</div>`
+    if (z.perZone) {
+      return html`
+        <div class="layout-title-band has-zones" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+          <div class="verso-title-zone" data-h-title="${z.title.horizontal}" data-v-title="${z.title.vertical}">
+            ${titleStrip}
+          </div>
+          ${contentZone(body, z.content.horizontal, z.content.vertical)}
+        </div>
+      `
+    }
+    return html`
+      <div class="layout-title-band" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        ${titleStrip}
+        ${body}
+      </div>
+    `
+  },
+})
+
+export const titleOnly = defineLayout({
+  name: 'title-only',
+  render: (slide, _ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    // Centered title slide. No content area. PowerPoint's "Title Only" master.
+    return html`
+      <div class="layout-title-only" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        ${headerBlock(slide)}
+        ${slide.title ? html`<h1 class="verso-title-only-title">${slide.title}</h1>` : ''}
+      </div>
+    `
+  },
+})
+
+export const calloutBanner = defineLayout({
+  name: 'callout-banner',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'center', vertical: 'middle' })
+    // Single full-width attention banner. The slide title becomes the banner
+    // headline; the first text block becomes the supporting sentence. Other
+    // blocks (if any) sit below the banner.
+    const first = ctx.blocks[0]
+    const rest = sliceIndexed(ctx.blocks, 1, ctx.blocks.length)
+    return html`
+      <div class="layout-callout-banner" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        <div class="verso-callout-banner">
+          ${headerBlock(slide)}
+          ${slide.title ? html`<h1 class="verso-callout-banner-title">${slide.title}</h1>` : ''}
+          ${first ? html`<div class="verso-callout-banner-body">${ctx.block(first, [0])}</div>` : ''}
+        </div>
+        ${rest.length > 0 ? html`<div class="verso-callout-banner-after">${renderIndexed(rest, ctx)}</div>` : ''}
+      </div>
+    `
+  },
+})
+
+export const chapter = defineLayout({
+  name: 'chapter',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    // Book-style chapter divider, heavier than section. Big chapter number /
+    // kicker, oversized title, optional intro paragraph.
+    const body = html`<div class="verso-chapter-body">${renderBlocks(ctx.blocks, ctx)}</div>`
+    return html`
+      <div class="layout-chapter" data-h="${z.content.horizontal}" data-v="${z.content.vertical}">
+        ${slide.header ? html`<div class="verso-chapter-kicker">${slide.header}</div>` : ''}
+        ${slide.title ? html`<h1 class="verso-chapter-title">${slide.title}</h1>` : ''}
+        ${body}
+      </div>
+    `
+  },
+})
+
+export const qAndA = defineLayout({
+  name: 'q-and-a',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // The first two top-level blocks become Q and A respectively. The first is
+    // the question (rendered with a Q marker), the second is the answer (with
+    // an A marker). Other blocks render below as supporting content.
+    const q = ctx.blocks[0]
+    const a = ctx.blocks[1]
+    const rest = sliceIndexed(ctx.blocks, 2, ctx.blocks.length)
+    const body = html`
+      <div class="verso-qa">
+        ${q ? html`<div class="verso-qa-row verso-qa-q"><span class="verso-qa-marker">Q</span><div class="verso-qa-body">${ctx.block(q, [0])}</div></div>` : ''}
+        ${a ? html`<div class="verso-qa-row verso-qa-a"><span class="verso-qa-marker">A</span><div class="verso-qa-body">${ctx.block(a, [1])}</div></div>` : ''}
+        ${rest.length > 0 ? html`<div class="verso-qa-after">${renderIndexed(rest, ctx)}</div>` : ''}
+      </div>
+    `
+    return withZones('layout-q-and-a', slide, z, body)
+  },
+})
+
+// --- Flow + structured -----------------------------------------------------
+
+export const processFlow = defineLayout({
+  name: 'process',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'middle' })
+    // Horizontal chevrons. Each block becomes one step. Steps are numbered
+    // by CSS counter; cards / text blocks render inside the step body.
+    const steps = ctx.blocks.map(
+      (b, i) => html`
+      <div class="verso-process-step" data-step="${String(i + 1)}">
+        <div class="verso-process-step-num">${String(i + 1)}</div>
+        <div class="verso-process-step-body">${ctx.block(b, [i])}</div>
+      </div>
+    `,
+    )
+    return withZones('layout-process', slide, z, html`<div class="verso-process">${steps}</div>`)
+  },
+})
+
+export const splitVertical = defineLayout({
+  name: 'split-vertical',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // Top half + bottom half, full-width 50/50. First half of blocks go on top,
+    // second half on bottom. Useful for showing two parallel concepts stacked.
+    const half = Math.ceil(ctx.blocks.length / 2)
+    const top = sliceIndexed(ctx.blocks, 0, half)
+    const bottom = sliceIndexed(ctx.blocks, half, ctx.blocks.length)
+    const stack = html`
+      <div class="verso-rows">
+        <div class="verso-row verso-row-top"><div class="verso-side-content">${renderIndexed(top, ctx)}</div></div>
+        <div class="verso-row verso-row-bottom"><div class="verso-side-content">${renderIndexed(bottom, ctx)}</div></div>
+      </div>
+    `
+    return withZones('layout-split-vertical', slide, z, stack)
+  },
+})
+
+export const roadmap = defineLayout({
+  name: 'roadmap',
+  render: (slide, ctx) => {
+    const z = resolveZoneAlign(slide.align, { horizontal: 'left', vertical: 'top' })
+    // Quarterly milestone columns. Each top-level block becomes a column
+    // (Q1, Q2, Q3, Q4 ... or arbitrary count). Cards inside the column read
+    // as milestones for that quarter. Auto-labels each column Q1..Qn from
+    // index unless the block is a heading (then heading text wins).
+    const columns = ctx.blocks.map((b, i) => {
+      const label = b.type === 'heading' ? (b as HeadingBlock).text : `Q${i + 1}`
+      return html`
+        <div class="verso-roadmap-col" data-quarter="${String(i + 1)}">
+          <div class="verso-roadmap-label">${label}</div>
+          <div class="verso-roadmap-body verso-side-content">${ctx.block(b, [i])}</div>
+        </div>
+      `
+    })
+    return withZones(
+      'layout-roadmap',
+      slide,
+      z,
+      html`<div class="verso-roadmap" data-count="${String(ctx.blocks.length)}">${columns}</div>`,
+    )
+  },
+})
+
+// =========================================================================
+
 export const builtInLayouts = [
   content,
   twoCol,
@@ -684,4 +1078,24 @@ export const builtInLayouts = [
   timeline,
   closing,
   author,
+  // New batch (19): asymmetric splits, grids, image-driven, special, flow.
+  oneThirdLeft,
+  oneThirdRight,
+  twoThirdsLeft,
+  twoThirdsRight,
+  quad,
+  iconGrid,
+  kpiBand,
+  swot,
+  pictureFill,
+  pictureWithCaption,
+  bento,
+  titleBand,
+  titleOnly,
+  calloutBanner,
+  chapter,
+  qAndA,
+  processFlow,
+  splitVertical,
+  roadmap,
 ]
