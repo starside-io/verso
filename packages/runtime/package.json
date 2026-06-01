@@ -1,6 +1,6 @@
 {
   "name": "@starside-io/verso-runtime",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Verso rendering engine and public extension API",
   "license": "Apache-2.0",
   "author": "starside.io",

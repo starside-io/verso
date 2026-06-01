@@ -1,6 +1,6 @@
 {
   "name": "@starside-io/verso-core",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Pure resolvers for Verso: path branching, color cascade, content flattening",
   "license": "Apache-2.0",
   "author": "starside.io",

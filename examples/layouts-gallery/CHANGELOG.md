@@ -1,5 +1,12 @@
 # @verso-example/layouts-gallery
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @starside-io/verso-cli@0.2.2
+
 ## 0.0.4
 
 ### Patch Changes

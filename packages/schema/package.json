@@ -1,6 +1,6 @@
 {
   "name": "@starside-io/verso-schema",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Zod schemas and TypeScript types for Verso decks, slides, and themes",
   "license": "Apache-2.0",
   "author": "starside.io",

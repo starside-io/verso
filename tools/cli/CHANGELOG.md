@@ -1,5 +1,19 @@
 # @starside-io/verso-cli
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [[`79b36af`](https://github.com/starside-io/verso/commit/79b36af21aee8693706addefd6cfc428791bab46)]:
+  - @starside-io/verso-layouts@0.4.0
+  - @starside-io/verso-schema@0.4.0
+  - @starside-io/verso-editor@0.4.0
+  - @starside-io/verso-viewer@0.3.3
+  - @starside-io/verso-build@0.2.3
+  - @starside-io/verso-core@0.1.3
+  - @starside-io/verso-runtime@0.3.1
+  - @starside-io/verso-themes@0.1.3
+
 ## 0.2.1
 
 ### Patch Changes
